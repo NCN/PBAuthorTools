@@ -398,6 +398,18 @@
                             </h2>
                             <div id="rhymeWordsCollapse" class="accordion-collapse collapse" data-bs-parent="#featuresAccordion">
                                 <div class="accordion-body">
+                                    <p class="text-muted small mb-3">
+                                        This tool detects words that are syllabically ambiguous or may have different pronunciations 
+                                        depending on regional accents, dialects, or reading styles. These words can cause issues 
+                                        in rhyming picture books when used as end rhymes.
+                                    </p>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="only-line-endings" checked>
+                                        <label class="form-check-label" for="only-line-endings">
+                                            Only detect at line or sentence endings 
+                                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="When checked, only finds problematic rhyming words that appear at the end of lines or sentences - where they would typically be used as rhymes."></i>
+                                        </label>
+                                    </div>
                                     <button id="detect-rhyme-words" class="btn btn-sm btn-primary mb-2">Detect Problematic Rhyme Words</button>
                                     <div id="rhyme-words-list" class="list-group">
                                         <!-- Rhyme words will be populated here -->
@@ -868,8 +880,117 @@
             // Problematic rhyme words detection
             document.getElementById('detect-rhyme-words').addEventListener('click', function() {
                 const text = getPlainTextFromEditor();
-                const rhymeWordsFound = detectSpecialWords(text, problematicRhymeWords);
-                displaySpecialWordsList(rhymeWordsFound, 'rhyme-words-list', 'Syllabically ambiguous words');
+                const onlyLineEndings = document.getElementById('only-line-endings').checked;
+                
+                if (onlyLineEndings) {
+                    // Filter for problematic rhyme words at line/sentence endings
+                    const rhymeWordsFound = detectRhymeWordsAtEndings(text, problematicRhymeWords);
+                    displaySpecialWordsList(rhymeWordsFound, 'rhyme-words-list', 'Problematic rhyme words at line/sentence endings');
+                } else {
+                    // Original function for finding anywhere in text
+                    const rhymeWordsFound = detectSpecialWords(text, problematicRhymeWords);
+                    displaySpecialWordsList(rhymeWordsFound, 'rhyme-words-list', 'Problematic rhyme words');
+                }
+            });
+
+            // New function to detect rhyme words specifically at line or sentence endings
+            function detectRhymeWordsAtEndings(text, wordList) {
+                // Remove art notes from the text first
+                const textWithoutArtNotes = removeArtNotes(text);
+                
+                // Split text into lines
+                const lines = textWithoutArtNotes.split(/\r?\n/).filter(line => line.trim() !== '');
+                
+                // Also split by sentence endings (.!?) to catch sentence endings that aren't line endings
+                const sentenceEndings = [];
+                const sentenceRegex = /[^.!?]+[.!?]+/g;
+                let match;
+                
+                while ((match = sentenceRegex.exec(textWithoutArtNotes)) !== null) {
+                    const sentence = match[0].trim();
+                    if (sentence) {
+                        const lastWord = getLastWord(sentence);
+                        if (lastWord) sentenceEndings.push(lastWord);
+                    }
+                }
+                
+                // Get last word of each line
+                const lineEndings = lines.map(line => getLastWord(line)).filter(Boolean);
+                
+                // Combine all ending words and filter to just the problematic ones
+                const allEndingWords = [...new Set([...lineEndings, ...sentenceEndings])];
+                const problematicEndingWords = {};
+                
+                allEndingWords.forEach(word => {
+                    // Clean the word (remove punctuation) and convert to lowercase
+                    const cleanWord = word.toLowerCase().replace(/[.,!?;:"']/g, '');
+                    
+                    if (wordList.includes(cleanWord)) {
+                        if (problematicEndingWords[cleanWord]) {
+                            problematicEndingWords[cleanWord]++;
+                        } else {
+                            problematicEndingWords[cleanWord] = 1;
+                        }
+                    }
+                });
+                
+                // Count occurrences of each problematic word in the text to get accurate counts
+                const wordFrequencies = {};
+                wordList.forEach(word => {
+                    if (problematicEndingWords[word]) {
+                        // Create a regex to find the word at the end of a line or before punctuation
+                        const lineEndRegex = new RegExp(`\\b${word}\\b[.,!?;:"']*\\s*$`, 'gim');
+                        const sentenceEndRegex = new RegExp(`\\b${word}\\b[.,!?;:"']+\\s`, 'gim');
+                        
+                        let lineEndCount = 0;
+                        let sentenceEndCount = 0;
+                        
+                        // Count as line endings
+                        let lineMatch;
+                        const textByLines = textWithoutArtNotes.split(/\r?\n/);
+                        textByLines.forEach(line => {
+                            const lineLower = line.toLowerCase();
+                            if (lineLower.endsWith(word) || 
+                                lineLower.endsWith(word + '.') || 
+                                lineLower.endsWith(word + '!') || 
+                                lineLower.endsWith(word + '?') || 
+                                lineLower.endsWith(word + ',')) {
+                                lineEndCount++;
+                            }
+                        });
+                        
+                        // Count as sentence endings
+                        let sentMatch;
+                        while ((sentMatch = sentenceEndRegex.exec(textWithoutArtNotes)) !== null) {
+                            sentenceEndCount++;
+                        }
+                        
+                        // Use the higher count (avoiding double-counting)
+                        wordFrequencies[word] = Math.max(lineEndCount, sentenceEndCount);
+                    }
+                });
+                
+                // Convert to array and sort by frequency
+                return Object.entries(wordFrequencies)
+                    .map(([word, count]) => ({ word: word, count: count }))
+                    .sort((a, b) => b.count - a.count);
+            }
+
+            // Helper function to get the last word of a string
+            function getLastWord(text) {
+                if (!text) return null;
+                
+                // Remove punctuation at the very end
+                const cleanText = text.trim().replace(/[.,!?;:"']+$/, '');
+                
+                // Get the last word
+                const words = cleanText.split(/\s+/);
+                return words[words.length - 1];
+            }
+            // Initialize all tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
             });
 
             // Process content changes with debouncing for better performance
