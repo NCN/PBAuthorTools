@@ -249,6 +249,12 @@
                         <!--<h4>Picture Book Manuscript</h4>-->
                         <p class="text-muted small">Paste your text below. Art notes will be highlighted automatically.</p>
                         <div id="editor"></div>
+                        <!-- Add the delete button here -->
+                        <div class="d-flex justify-content-end mt-3 mb-2">
+                            <button id="delete-art-notes" class="btn btn-danger">
+                                <i class="fas fa-trash-alt me-2"></i>Delete All Art Notes
+                            </button>
+                        </div>
                         <p class="privacy-notice mt-2">
                             <i class="fas fa-shield-alt me-1"></i> Your manuscript never leaves your browser. No text is sent to our servers or stored.
                         </p>
@@ -490,6 +496,69 @@
             </div>
         </footer>
     </div>
+
+    <!-- Add Modal HTML for Art Note Deletion -->
+    <div class="modal fade" id="noArtNotesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">No Art Notes Found</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-info-circle text-info" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="text-center">No art notes were found in your manuscript.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="text-center" id="confirm-delete-text">Are you sure you want to delete all art notes from your manuscript? This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete All Art Notes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="successDeleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Success</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-check-circle text-success" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="text-center" id="success-delete-text">Successfully removed art notes from your manuscript.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Add your JavaScript functions here -->
     <script>
         // Load scripts
@@ -1759,6 +1828,77 @@
         });
         document.getElementById('rhymeWordsCollapse').addEventListener('hidden.bs.collapse', function () {
             clearWordHighlights();
+        });
+
+        // Art note deletion functionality
+        document.getElementById('delete-art-notes').addEventListener('click', function() {
+            // Get current text
+            const text = quill.getText();
+            
+            // Find all art notes
+            const artNotes = findArtNotes(text);
+            
+            // If no art notes, show modal and return
+            if (artNotes.length === 0) {
+                const noArtNotesModal = new bootstrap.Modal(document.getElementById('noArtNotesModal'));
+                noArtNotesModal.show();
+                return;
+            }
+            
+            // Update confirmation text with count
+            document.getElementById('confirm-delete-text').textContent = 
+                `Are you sure you want to delete all ${artNotes.length} art note${artNotes.length === 1 ? '' : 's'} from your manuscript? This action cannot be undone.`;
+            
+            // Show confirmation dialog
+            const confirmModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+            confirmModal.show();
+            
+            // Handle confirmation button click
+            document.getElementById('confirm-delete-btn').onclick = function() {
+                // Close the confirmation modal
+                confirmModal.hide();
+                
+                // Sort art notes in reverse order (to avoid index shifting when removing)
+                artNotes.sort((a, b) => b.start - a.start);
+                
+                // Store current selection if any
+                const currentSelection = quill.getSelection();
+                
+                // Delete each art note, starting from the end
+                artNotes.forEach(note => {
+                    quill.deleteText(note.start, note.end - note.start + 1);
+                });
+                
+                // Restore selection if applicable
+                if (currentSelection) {
+                    // Adjust selection position if needed based on deletions
+                    let adjustedIndex = currentSelection.index;
+                    artNotes.forEach(note => {
+                        if (note.start < currentSelection.index) {
+                            adjustedIndex -= (note.end - note.start + 1);
+                        }
+                    });
+                    
+                    // Ensure index is not negative
+                    adjustedIndex = Math.max(0, adjustedIndex);
+                    
+                    // Set selection
+                    quill.setSelection(adjustedIndex, 0);
+                }
+                
+                // Update word counts and other stats
+                updateWordCounts();
+                
+                // Show success message with appropriate singular/plural
+                document.getElementById('success-delete-text').textContent = 
+                    `Successfully removed ${artNotes.length} art note${artNotes.length === 1 ? '' : 's'} from your manuscript.`;
+                
+                // Show success modal
+                setTimeout(() => {
+                    const successModal = new bootstrap.Modal(document.getElementById('successDeleteModal'));
+                    successModal.show();
+                }, 300); // Small delay to allow confirmation modal to fully close
+            };
         });
         });
 
