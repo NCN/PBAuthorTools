@@ -246,15 +246,8 @@
             <div class="row mb-4">
                 <div class="col-md-8">
                     <div class="editor-container">
-                        <!--<h4>Picture Book Manuscript</h4>-->
                         <p class="text-muted small">Paste your text below. Art notes will be highlighted automatically.</p>
                         <div id="editor"></div>
-                        <!-- Add the delete button here -->
-                        <div class="d-flex justify-content-end mt-3 mb-2">
-                            <button id="delete-art-notes" class="btn btn-danger">
-                                <i class="fas fa-trash-alt me-2"></i>Delete All Art Notes
-                            </button>
-                        </div>
                         <p class="privacy-notice mt-2">
                             <i class="fas fa-shield-alt me-1"></i> Your manuscript never leaves your browser. No text is sent to our servers or stored.
                         </p>
@@ -420,6 +413,24 @@
                                     <div id="rhyme-words-list" class="list-group">
                                         <!-- Rhyme words will be populated here -->
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#deleteArtNotesCollapse">
+                                    <i class="fas fa-trash-alt me-2"></i> Remove Art Notes
+                                </button>
+                            </h2>
+                            <div id="deleteArtNotesCollapse" class="accordion-collapse collapse" data-bs-parent="#featuresAccordion">
+                                <div class="accordion-body">
+                                    <p class="text-muted small mb-3">
+                                        This tool allows you to completely remove all art notes from your manuscript.
+                                        Useful when you need a clean version without any illustrator notes.
+                                    </p>
+                                    <button id="delete-art-notes" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-trash-alt me-2"></i>Delete All Art Notes
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1864,10 +1875,25 @@
                 // Store current selection if any
                 const currentSelection = quill.getSelection();
                 
+                // Get the full text content
+                let contents = quill.getContents();
+                
+                // Track lines where we've removed art notes to check if they become empty
+                const affectedLineIndices = new Set();
+                
                 // Delete each art note, starting from the end
                 artNotes.forEach(note => {
+                    // Find line index for this art note
+                    const linePositions = getLineIndicesForRange(note.start, note.end);
+                    linePositions.forEach(idx => affectedLineIndices.add(idx));
+                    
+                    // Delete the art note
                     quill.deleteText(note.start, note.end - note.start + 1);
                 });
+                
+                // After deleting art notes, check affected lines to see if any are now empty
+                // and remove them if so
+                removeEmptyLines(Array.from(affectedLineIndices));
                 
                 // Restore selection if applicable
                 if (currentSelection) {
@@ -1900,6 +1926,61 @@
                 }, 300); // Small delay to allow confirmation modal to fully close
             };
         });
+
+        // Function to get line indices for a range
+        function getLineIndicesForRange(startIndex, endIndex) {
+            const lines = new Set();
+            
+            // Get text and split into lines
+            const text = quill.getText();
+            const textLines = text.split('\n');
+            
+            // Find which lines the range falls within
+            let charCounter = 0;
+            for (let i = 0; i < textLines.length; i++) {
+                const lineLength = textLines[i].length + 1; // +1 for the newline character
+                const lineStart = charCounter;
+                const lineEnd = charCounter + lineLength - 1;
+                
+                // Check if this line overlaps with our range
+                if (!(endIndex < lineStart || startIndex > lineEnd)) {
+                    lines.add(i);
+                }
+                
+                charCounter += lineLength;
+            }
+            
+            return Array.from(lines);
+        }
+
+        // Function to check for and remove empty lines
+        function removeEmptyLines(lineIndices) {
+            // Work from bottom to top to avoid index shifting issues
+            lineIndices.sort((a, b) => b - a);
+            
+            for (const lineIndex of lineIndices) {
+                const line = quill.getLine(lineIndex);
+                
+                // Skip if line is undefined (can happen with complex formatting)
+                if (!line || !line[0]) continue;
+                
+                // Get the line's text content
+                const lineText = line[0].text();
+                
+                // If the line is empty or just whitespace, delete it
+                if (lineText.trim() === '') {
+                    // The line index gives us the position in the document
+                    const index = quill.getIndex(line[0]);
+                    const length = line[0].length();
+                    
+                    if (length > 0) {
+                        quill.deleteText(index, length);
+                    }
+                }
+            }
+        }
+        
+
         });
 
         function addLogoutButton() {
