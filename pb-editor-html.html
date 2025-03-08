@@ -87,6 +87,47 @@
             background-color: rgba(217, 83, 79, 0.1) !important;
             border-radius: 3px;
         }
+
+        /* Readability analysis styling */
+        .readability-results {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .metric-card {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: transform 0.2s;
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4263eb;
+        }
+        .metric-label {
+            color: #495057;
+            font-size: 0.9rem;
+        }
+        .age-recommendation {
+            background-color: #e3faff;
+            border-left: 4px solid #00bcd4;
+        }
+        .reading-ease {
+            background-color: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
+        .school-level {
+            background-color: #e8f4ff;
+            border-left: 4px solid #007bff;
+        }
     </style>
 </head>
 <body>
@@ -235,6 +276,77 @@
                     </div>
                     
                     <div class="accordion" id="featuresAccordion">
+                        <!-- NEW READABILITY ANALYSIS ACCORDION ITEM -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#readabilityCollapse">
+                                    <i class="fas fa-book-reader me-2"></i> Readability Analysis
+                                </button>
+                            </h2>
+                            <div id="readabilityCollapse" class="accordion-collapse collapse" data-bs-parent="#featuresAccordion">
+                                <div class="accordion-body">
+                                    <button id="analyze-readability" class="btn btn-sm btn-primary mb-3">Analyze Readability</button>
+                                    <div class="readability-results" style="display: none;" id="readability-results">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card">
+                                                    <div class="metric-value" id="word-count">0</div>
+                                                    <div class="metric-label">Word Count</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card">
+                                                    <div class="metric-value" id="sentence-count">0</div>
+                                                    <div class="metric-label">Sentence Count</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card">
+                                                    <div class="metric-value" id="avg-words-per-sentence">0</div>
+                                                    <div class="metric-label">Avg Words Per Sentence</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card">
+                                                    <div class="metric-value" id="avg-syllables-per-word">0</div>
+                                                    <div class="metric-label">Avg Syllables Per Word</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card">
+                                                    <div class="metric-value" id="flesch-kincaid-grade">0</div>
+                                                    <div class="metric-label">Grade Level</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card">
+                                                    <div class="metric-value" id="flesch-reading-ease">0</div>
+                                                    <div class="metric-label">Reading Ease Score</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card">
+                                                    <div class="metric-value" id="complex-word-percentage">0%</div>
+                                                    <div class="metric-label">Complex Words (3+ syllables)</div>
+                                                </div>
+                                            </div>
+                                            <!--<div class="col-md-6 mb-2">
+                                                <div class="metric-card reading-ease">
+                                                    <div class="metric-value" id="reading-ease-category">-</div>
+                                                    <div class="metric-label">Reading Ease Category</div>
+                                                </div>
+                                            </div>-->
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card school-level">
+                                                    <div class="metric-value" id="school-level">-</div>
+                                                    <div class="metric-label">School Level</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="accordion-item">
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#wordCloudCollapse">
@@ -312,7 +424,16 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
+                <div class="card feature-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-book-reader icon-feature"></i>
+                        <h5 class="card-title">Readability Analysis</h5>
+                        <p class="card-text">Analyze your text's grade level and age appropriateness with Flesch-Kincaid metrics.</p>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="col-md-4 mb-3">
                 <div class="card feature-card">
                     <div class="card-body text-center">
                         <i class="fas fa-paint-brush icon-feature"></i>
@@ -320,12 +441,12 @@
                         <p class="card-text">Instantly identifies and highlights art notes as you type or paste your manuscript.</p>
                     </div>
                 </div>
-            </div>
+            </div>-->
             <div class="col-md-4 mb-3">
                 <div class="card feature-card">
                     <div class="card-body text-center">
                         <i class="fas fa-cloud icon-feature"></i>
-                        <h5 class="card-title">Word Analysis</h5>
+                        <h5 class="card-title">More cool tools</h5>
                         <p class="card-text">Generate word clouds, frequency lists, and identify adverbs or problematic rhyming words.</p>
                     </div>
                 </div>
@@ -371,6 +492,205 @@
             <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"><\/script>
         `);
 
+
+        // Readability Analysis Module
+        class ReadabilityAnalyzer {
+            // Syllable Counting Function
+            static countSyllables(word) {
+                // Trim and convert to lowercase
+                word = word.toLowerCase().trim();
+                
+                // Remove non-alphabetic characters
+                word = word.replace(/[^a-z]/g, '');
+                
+                // If word is empty, return 0
+                if (word.length === 0) return 0;
+                
+                // Truly irregular words (rare exceptions)
+                const specialCases = {
+                    'colonel': 3,    // unique pronunciation
+                    'lengthwise': 2, // tricky syllable structure
+                    'squirrel': 2    // non-standard syllable break
+                };
+                
+                // Check special cases first
+                if (specialCases.hasOwnProperty(word)) {
+                    return specialCases[word];
+                }
+                
+                // Preprocessing rules
+                // 1. Handle silent 'e' at the end
+                if (word.endsWith('e')) {
+                    // Remove silent 'e' for syllable counting, but with exceptions
+                    const exceptions = ['le', 'age', 'ige'];
+                    if (!exceptions.some(ex => word.endsWith(ex))) {
+                        word = word.slice(0, -1);
+                    }
+                }
+                
+                // Improved vowel group detection
+                // This regex looks for sequences of vowels that create distinct syllables
+                const syllableMatches = word.match(/[aeiouy]+/g) || [];
+                
+                // Base syllable count from vowel groups
+                let syllableCount = syllableMatches.length;
+                
+                // Adjust for specific phonetic rules
+                // Diphthongs and triphthongs often count as one syllable
+                const diphthongs = ['ai', 'au', 'ea', 'ee', 'ei', 'ie', 'oa', 'oe', 'oo', 'ou'];
+                const complexVowelReduction = syllableMatches.filter(group => 
+                    diphthongs.includes(group) || group.length > 2
+                ).length;
+                
+                // Adjust syllable count
+                syllableCount -= complexVowelReduction;
+                
+                // Sophisticated handling of 'io' combinations
+                // Context-aware syllable adjustment
+                const complexWordPatterns = [
+                    // Patterns where 'io' is part of a single syllable
+                    /[aeiou]tion$/,   // action, fiction
+                    /^[aeiou]nion/,   // onion
+                    
+                    // Patterns where 'io' might split into two syllables
+                    /^li[oa]n/        // lion
+                ];
+                
+                // Check if the word matches any of these patterns
+                const matchedPattern = complexWordPatterns.some(pattern => pattern.test(word));
+                
+                // Adjust syllable count based on pattern matching
+                if (matchedPattern) {
+                    if (/^li[oa]n/.test(word)) {
+                        // Specifically handle words like 'lion'
+                        syllableCount++;
+                    } else if (/[aeiou]tion$/.test(word) || /^[aeiou]nion/.test(word)) {
+                        // Ensure correct syllable count for words like 'action', 'onion'
+                        syllableCount = syllableCount;
+                    }
+                }
+                
+                // Ensure at least one syllable
+                syllableCount = Math.max(1, syllableCount);
+                
+                // Prevent unreasonably high syllable counts
+                syllableCount = Math.min(syllableCount, word.length);
+                
+                return syllableCount;
+            }
+
+            // Utility function to remove art notes and clean text
+            static removeArtNotes(text) {
+                // Remove text within square brackets or parentheses that might be art notes
+                return text.replace(/\[.*?\]|\(.*?\)/g, '');
+            }
+
+            // Utility function to get words from text
+            static getWordsFromText(text) {
+                // Clean the text and split into words
+                return text.toLowerCase()
+                    .replace(/["".,\/#—!$%\^&\*;:{}=\_`''~()?"…\[\]]/g, ' ')
+                    .replace(/(^|\s)-|-(\s|$)/g, ' ')
+                    .replace(/\s{2,}/g, ' ')
+                    .trim()
+                    .split(/\s+/);
+            }
+
+            // Analyze Readability
+            static analyze(text) {
+                // Remove art notes and clean text
+                const cleanText = this.removeArtNotes(text);
+                
+                // Split into sentences and words
+                const sentences = cleanText.split(/[.!?]+/).filter(s => s.trim().length > 0);
+                const words = this.getWordsFromText(cleanText);
+                
+                // Basic metrics
+                const totalSentences = sentences.length;
+                const totalWords = words.length;
+                const totalSyllables = words.reduce((sum, word) => sum + this.countSyllables(word), 0);
+                
+                // Prevent division by zero
+                if (totalSentences === 0 || totalWords === 0) {
+                    return {
+                        totalWords: 0,
+                        totalSentences: 0,
+                        averageWordsPerSentence: 0,
+                        averageSyllablesPerWord: 0,
+                        fleschKincaidGradeLevel: 0,
+                        fleschReadingEase: 0,
+                        complexWordPercentage: 0,
+                        //readingEaseCategory: 'N/A',
+                        schoolLevel: 'N/A'
+                    };
+                }
+                
+                // Calculations
+                const averageWordsPerSentence = totalWords / totalSentences;
+                const averageSyllablesPerWord = totalSyllables / totalWords;
+                
+                // Flesch-Kincaid Grade Level Formula
+                const fleschKincaidGradeLevel = 
+                    0.39 * (totalWords / totalSentences) + 
+                    11.8 * (totalSyllables / totalWords) - 
+                    15.59;
+                
+                // Flesch Reading Ease Formula
+                const fleschReadingEase = 
+                    206.835 - 
+                    (1.015 * (totalWords / totalSentences)) - 
+                    (84.6 * (totalSyllables / totalWords));
+                
+                // Complex word percentage (words with 3+ syllables)
+                const complexWords = words.filter(word => this.countSyllables(word) >= 3);
+                const complexWordPercentage = (complexWords.length / totalWords) * 100;
+                
+                // Reading ease category
+                //let readingEaseCategory = 'Unknown';
+                
+                // Flesch Reading Ease categorization
+                /*if (fleschReadingEase >= 90) readingEaseCategory = 'Very Easy';
+                else if (fleschReadingEase >= 80) readingEaseCategory = 'Easy';
+                else if (fleschReadingEase >= 70) readingEaseCategory = 'Fairly Easy';
+                else if (fleschReadingEase >= 60) readingEaseCategory = 'Standard';
+                else if (fleschReadingEase >= 50) readingEaseCategory = 'Fairly Difficult';
+                else if (fleschReadingEase >= 30) readingEaseCategory = 'Difficult';
+                else readingEaseCategory = 'Very Difficult';*/
+                
+                // School level based on Flesch Reading Ease
+                let schoolLevel = 'Unknown';
+                if (fleschReadingEase >= 90) schoolLevel = '5th Grade';
+                else if (fleschReadingEase >= 80) schoolLevel = '6th Grade';
+                else if (fleschReadingEase >= 70) schoolLevel = '7th Grade';
+                else if (fleschReadingEase >= 60) schoolLevel = '8-9th Grade';
+                else if (fleschReadingEase >= 50) schoolLevel = '10-12th Grade';
+                else if (fleschReadingEase >= 30) schoolLevel = 'College';
+                else schoolLevel = 'College Graduate';
+                
+                return {
+                    totalWords,
+                    totalSentences,
+                    averageWordsPerSentence: averageWordsPerSentence.toFixed(1),
+                    averageSyllablesPerWord: averageSyllablesPerWord.toFixed(1),
+                    fleschKincaidGradeLevel: fleschKincaidGradeLevel.toFixed(1),
+                    fleschReadingEase: fleschReadingEase.toFixed(1),
+                    complexWordPercentage: complexWordPercentage.toFixed(1),
+                    //readingEaseCategory,
+                    schoolLevel
+                };
+            }
+        }
+
+        // Debounce function to limit how often a function is called
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), wait);
+            };
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
 
             const firebaseConfig = {
@@ -385,6 +705,54 @@
 
             // Initialize Firebase
             firebase.initializeApp(firebaseConfig);  
+
+            // Set up the readability analysis feature
+            document.getElementById('analyze-readability').addEventListener('click', function() {
+                // Get text from the editor (excluding art notes)
+                const text = getPlainTextFromEditor();
+                
+                // Show the results container
+                const resultsContainer = document.getElementById('readability-results');
+                resultsContainer.style.display = 'block';
+                
+                // Run the analysis
+                const results = ReadabilityAnalyzer.analyze(text);
+                
+                // Update the UI with the results
+                document.getElementById('word-count').textContent = results.totalWords;
+                document.getElementById('sentence-count').textContent = results.totalSentences;
+                document.getElementById('avg-words-per-sentence').textContent = results.averageWordsPerSentence;
+                document.getElementById('avg-syllables-per-word').textContent = results.averageSyllablesPerWord;
+                document.getElementById('flesch-kincaid-grade').textContent = results.fleschKincaidGradeLevel;
+                document.getElementById('flesch-reading-ease').textContent = results.fleschReadingEase;
+                document.getElementById('complex-word-percentage').textContent = results.complexWordPercentage + '%';
+                //document.getElementById('reading-ease-category').textContent = results.readingEaseCategory;
+                document.getElementById('school-level').textContent = results.schoolLevel;
+                
+                // Add helpful context based on the results
+                const gradeLevel = parseFloat(results.fleschKincaidGradeLevel);
+                const readingEase = parseFloat(results.fleschReadingEase);
+                
+                // Add color coding based on grade level appropriateness for picture books
+                const gradeElement = document.getElementById('flesch-kincaid-grade');
+                if (gradeLevel <= 3) {
+                    gradeElement.style.color = '#28a745'; // Green - appropriate for picture books
+                } else if (gradeLevel <= 4.5) {
+                    gradeElement.style.color = '#fd7e14'; // Orange - might be challenging
+                } else {
+                    gradeElement.style.color = '#dc3545'; // Red - likely too complex
+                }
+                
+                // Add color coding for reading ease
+                const easeElement = document.getElementById('flesch-reading-ease');
+                if (readingEase >= 80) {
+                    easeElement.style.color = '#28a745'; // Green - very easy to read
+                } else if (readingEase >= 60) {
+                    easeElement.style.color = '#fd7e14'; // Orange - moderately easy
+                } else {
+                    easeElement.style.color = '#dc3545'; // Red - difficult
+                }
+            });
 
             // Initialize Quill editor
             const quill = new Quill('#editor', {
@@ -417,16 +785,6 @@
             // These patterns detect art notes, including those that span multiple lines
             const bracketArtNoteRegex = /\[([\s\S]*?)\]/g;
             const parenArtNoteRegex = /\((?:[\s\S]*?art note[\s\S]*?|[\s\S]*?illus[\s\S]*?|[\s\S]*?illo[\s\S]*?|[\s\S]*?illustration note[\s\S]*?|[\s\S]*?action note[\s\S]*?)\)/gi;
-
-            // Debounce function to limit how often a function is called
-            function debounce(func, wait) {
-                let timeout;
-                return function(...args) {
-                    const context = this;
-                    clearTimeout(timeout);
-                    timeout = setTimeout(() => func.apply(context, args), wait);
-                };
-            }
 
             // Lists of special words for detection
             const adverbList = ["abnormally", "abruptly", "absently", "absentmindedly", "accidentally", "accusingly", "actually", "adventurously", "adversely", "amazingly", "angrily", "anxiously", "arrogantly", "awkwardly", "badly", "bashfully", "beautifully", "bitterly", "bleakly", "blindly", "blissfully", "boastfully", "boldly", "bravely", "briefly", "brightly", "briskly", "broadly", "busily", "calmly", "carefully", "carelessly", "cautiously", "certainly", "cheerfully", "clearly", "cleverly", "closely", "coaxingly", "colorfully", "continually", "coolly", "correctly", "courageously", "crossly", "cruelly", "curiously", "daintily", "daringly", "dearly", "deceivingly", "deeply", "defiantly", "deliberately", "delightfully", "desperately", "determinedly", "diligently", "dimly", "doubtfully", "dreamily", "eagerly", "easily", "elegantly", "energetically", "enormously", "enthusiastically", "especially", "evenly", "eventually", "excitedly", "extremely", "fairly", "faithfully", "famously", "fatally", "ferociously", "fervently", "fiercely", "fondly", "foolishly", "fortunately", "frankly", "frantically", "freely", "frenetically", "frightfully", "fully", "furiously", "generally", "generously", "gently", "gladly", "gleefully", "gracefully", "gratefully", "greatly", "greedily", "happily", "harshly", "hastily", "healthily", "heartily", "heavily", "helpfully", "helplessly", "highly", "honestly", "hopelessly", "hungrily", "hurriedly", "immediately", "inadequately", "increasingly", "innocently", "inquisitively", "instantly", "intensely", "intently", "interestingly", "inwardly", "irritably", "jaggedly", "jealously", "jovially", "joyfully", "joyously", "jubilantly", "judgmentally", "justly", "keenly", "kiddingly", "kindheartedly", "kindly", "knavishly", "knowingly", "knowledgeably", "kookily", "lazily", "lightly", "limply", "lively", "loftily", "longingly", "loosely", "loudly", "lovingly", "loyally", "madly", "majestically", "meaningfully", "mechanically", "merrily", "miserably", "mockingly", "mortally", "mysteriously", "naturally", "neatly", "nervously", "nicely", "noisily", "obediently", "obnoxiously", "oddly", "offensively", "officially", "openly", "optimistically", "overconfidently", "painfully", "partially", "patiently", "perfectly", "physically", "playfully", "politely", "poorly", "positively", "potentially", "powerfully", "promptly", "properly", "proudly", "punctually", "quaintly", "queasily", "questionably", "quicker", "quickly", "quietly", "quirkily", "quizzically", "randomly", "rapidly", "ravenously", "readily", "reassuringly", "recklessly", "regularly", "reluctantly", "repeatedly", "reproachfully", "restfully", "righteously", "rightfully", "rigidly", "roughly", "rudely", "sadly", "safely", "scarcely", "scarily", "searchingly", "sedately", "seemingly", "seldom", "selfishly", "separately", "seriously", "shakily", "sharply", "sheepishly", "shrilly", "shyly", "silently", "sleepily", "slowly", "smoothly", "softly", "solemnly", "solidly", "speedily", "stealthily", "sternly", "strictly", "stubbornly", "stupidly", "successfully", "suddenly", "supposedly", "surprisingly", "suspiciously", "sweetly", "swiftly", "sympathetically", "tenderly", "tensely", "terribly", "thankfully", "thoroughly", "thoughtfully", "tightly", "tremendously", "triumphantly", "truly", "truthfully", "ultimately", "unabashedly", "unaccountably", "unbearably", "understandingly", "unethically", "unexpectedly", "unfortunately", "unhappily", "unimpressively", "unnaturally", "unnecessarily", "unwillingly", "urgently", "usefully", "uselessly", "usually", "utterly", "vacantly", "vaguely", "vainly", "valiantly", "vastly", "verbally", "viciously", "victoriously", "violently", "vivaciously", "voluntarily", "warmly", "weakly", "wearily", "wetly", "wholly", "wildly", "willfully", "wisely", "woefully", "wonderfully", "worriedly", "wrongly", "yawningly", "yearly", "yearningly", "yieldingly", "youthfully", "zealously", "zestfully", "zestily"];
@@ -968,41 +1326,9 @@
                 merged.push(current);
                 return merged;
             }
+        //});
 
-            
-            // Add sample book text button for testing
-            /*const sampleButton = document.createElement('button');
-            sampleButton.className = 'btn btn-sm btn-secondary mt-2';
-            sampleButton.textContent = 'Insert Sample Text';
-            sampleButton.addEventListener('click', function() {
-                quill.setText('');
-                quill.insertText(0, `THE nicked]`);
-                
-                setTimeout(function() {
-                    updateWordCounts();
-                }, 100);
-            });
-            
-            // Add a test multi-line art note button
-            const testMultilineButton = document.createElement('button');
-            testMultilineButton.className = 'btn btn-sm btn-info mt-2 ms-2';
-            testMultilineButton.textContent = 'Test Multi-line Art Notes';
-            testMultilineButton.addEventListener('click', function() {
-                // Insert text with various multi-line art notes
-                quill.setText('');
-                quill.insertText(0, `Multi-litest.`);
-                
-                setTimeout(function() {
-                    updateWordCounts();
-                }, 100);
-            });*/
-            
-            // Add the buttons after the editor
-            document.querySelector('.editor-container').appendChild(sampleButton);
-            document.querySelector('.editor-container').appendChild(testMultilineButton);
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
+        //document.addEventListener('DOMContentLoaded', function() {
         // Initialize Firebase Authentication
         const auth = firebase.auth();
         const db = firebase.firestore();
@@ -1096,14 +1422,7 @@
             const provider = new firebase.auth.GoogleAuthProvider();
             signInWithProvider(provider);
         });
-        
-        /*document.getElementById('google-signup-btn')?.addEventListener('click', function() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            // Use the newsletter checkbox state from the signup form
-            const newsletter = document.getElementById('newsletter-consent').checked;
-            signInWithProvider(provider, newsletter);
-        });*/
-        
+               
         function signInWithProvider(provider, newsletter = true) {
             auth.signInWithPopup(provider)
             .then((result) => {
@@ -1171,34 +1490,8 @@
                 this.innerHTML = 'Send Reset Link';
             });
         });
-        
-        // Logout button
-        //addLogoutButton();
+    
         });
-
-        // Add logout button
-        /*function addLogoutButton() {
-            if (!document.getElementById('logout-button')) {
-                const logoutButton = document.createElement('button');
-                logoutButton.id = 'logout-button';
-                logoutButton.className = 'btn btn-outline-secondary mt-3 w-100';
-                logoutButton.innerHTML = '<i class="fas fa-sign-out-alt me-2"></i>Logout';
-                
-                logoutButton.addEventListener('click', function() {
-                firebase.auth().signOut().then(() => {
-                    document.getElementById('login-section').style.display = 'block';
-                    document.getElementById('editor-section').style.display = 'none';
-                });
-                });
-                
-                // Add to the stats panel when user is logged in
-                firebase.auth().onAuthStateChanged(function(user) {
-                if (user && document.querySelector('.stats-panel')) {
-                    document.querySelector('.stats-panel').appendChild(logoutButton);
-                }
-                });
-            }
-        }*/
 
         function addLogoutButton() {
             const headerDiv = document.querySelector('header > div');
