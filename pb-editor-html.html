@@ -861,7 +861,8 @@
             // Art note detection regex patterns
             // These patterns detect art notes, including those that span multiple lines
             const bracketArtNoteRegex = /\[([\s\S]*?)\]/g;
-            const parenArtNoteRegex = /\((?:[\s\S]*?art note[\s\S]*?|[\s\S]*?illus[\s\S]*?|[\s\S]*?illo[\s\S]*?|[\s\S]*?illustration note[\s\S]*?|[\s\S]*?action note[\s\S]*?)\)/gi;
+            //const parenArtNoteRegex = /\((?:[\s\S]*?art note[\s\S]*?|[\s\S]*?illus[\s\S]*?|[\s\S]*?illo[\s\S]*?|[\s\S]*?illustration note[\s\S]*?|[\s\S]*?action note[\s\S]*?)\)/gi;
+            const parenArtNoteRegex = /\((?:[\s\S]*?art note[\s\S]*?|[\s\S]*?art:[\s\S]*?|[\s\S]*?illus[\s\S]*?|[\s\S]*?illo[\s\S]*?|[\s\S]*?illustration note[\s\S]*?|[\s\S]*?action note[\s\S]*?)\)/gi;
 
             // Lists of special words for detection
             const adverbList = [
@@ -1096,7 +1097,8 @@
             const processContentChanges = debounce(function() {
                 // Simply update word counts and highlight art notes
                 updateWordCounts();
-            }, 300);
+                highlightArtNotes(); // Explicitly call highlighting to ensure it updates
+            }, 100);
 
             // Monitor quill content changes
             quill.on('text-change', processContentChanges);
@@ -1194,13 +1196,16 @@
                 const artNotes = [];
                 let bracketDepth = 0;
                 let parenDepth = 0;
-                let currentArtNote = "";
-                let startIndex = -1;
+                let currentBracketNote = "";
+                let currentParenNote = "";
+                let bracketStartIndex = -1;
+                let parenStartIndex = -1;
                 let inBracketArtNote = false;
                 let inParenArtNote = false;
                 
                 // For parenthetical art notes, we need keywords
-                const artNoteKeywords = ["art note", "illo", "illus", "illustration note", "action note"];
+                //const artNoteKeywords = ["art note", "illo", "illus", "illustration note", "action note"];
+                const artNoteKeywords = ["art note", "art:", "illo", "illus", "illustration note", "action note"];
                 
                 for (let i = 0; i < text.length; i++) {
                     const char = text[i];
@@ -1209,27 +1214,27 @@
                     if (char === '[' && !inParenArtNote) {
                         if (bracketDepth === 0) {
                             // Start of a potential art note
-                            startIndex = i;
-                            currentArtNote = "[";
+                            bracketStartIndex = i;
+                            currentBracketNote = "[";
                             inBracketArtNote = true;
                         } else {
                             // Nested brackets inside art note
-                            currentArtNote += char;
+                            currentBracketNote += char;
                         }
                         bracketDepth++;
                     } 
                     else if (char === ']' && inBracketArtNote) {
                         bracketDepth--;
-                        currentArtNote += char;
+                        currentBracketNote += char;
                         
                         if (bracketDepth === 0) {
                             // End of art note
                             artNotes.push({
-                                text: currentArtNote,
-                                start: startIndex,
+                                text: currentBracketNote,
+                                start: bracketStartIndex,
                                 end: i
                             });
-                            currentArtNote = "";
+                            currentBracketNote = "";
                             inBracketArtNote = false;
                         }
                     }
@@ -1237,39 +1242,61 @@
                     else if (char === '(' && !inBracketArtNote) {
                         if (parenDepth === 0) {
                             // This might be the start of a parenthetical art note
-                            // We'll need to check if it contains art note keywords
-                            startIndex = i;
-                            currentArtNote = "(";
+                            parenStartIndex = i;
+                            currentParenNote = "(";
                             inParenArtNote = true;
                         } else if (inParenArtNote) {
                             // Nested parentheses
-                            currentArtNote += char;
+                            currentParenNote += char;
                         }
                         parenDepth++;
                     }
                     else if (char === ')' && inParenArtNote) {
                         parenDepth--;
-                        currentArtNote += char;
+                        currentParenNote += char;
                         
                         if (parenDepth === 0) {
                             // Check if this parenthetical note contains any art note keywords
-                            const noteText = currentArtNote.toLowerCase();
+                            const noteText = currentParenNote.toLowerCase();
                             const isArtNote = artNoteKeywords.some(keyword => noteText.includes(keyword));
                             
                             if (isArtNote) {
                                 artNotes.push({
-                                    text: currentArtNote,
-                                    start: startIndex,
+                                    text: currentParenNote,
+                                    start: parenStartIndex,
                                     end: i
                                 });
                             }
                             
-                            currentArtNote = "";
+                            currentParenNote = "";
                             inParenArtNote = false;
                         }
                     }
-                    else if (inBracketArtNote || inParenArtNote) {
-                        currentArtNote += char;
+                    else {
+                        // Add character to the current art note if we're inside one
+                        if (inBracketArtNote) {
+                            currentBracketNote += char;
+                        }
+                        if (inParenArtNote) {
+                            currentParenNote += char;
+                        }
+                    }
+                }
+                
+                // Handle unclosed art notes (important for real-time editing)
+                // For brackets - if we have an unclosed bracket art note, don't treat it as an art note
+                // For parentheses - only consider it if it has keywords
+                if (inParenArtNote && parenStartIndex >= 0) {
+                    // Check if this unclosed parenthetical contains keywords
+                    const noteText = currentParenNote.toLowerCase();
+                    const isArtNote = artNoteKeywords.some(keyword => noteText.includes(keyword));
+                    
+                    if (isArtNote) {
+                        artNotes.push({
+                            text: currentParenNote,
+                            start: parenStartIndex,
+                            end: text.length - 1
+                        });
                     }
                 }
                 
@@ -1527,7 +1554,7 @@
                 highlightArtNotes();
             }
             
-            function highlightArtNotes() {
+            /*function highlightArtNotes() {
                 // Get the text to search for art notes
                 const text = quill.getText();
                 
@@ -1572,7 +1599,64 @@
                         'background': 'yellow'
                     });
                 });
+            }*/
+
+            function highlightArtNotes() {
+                // Get the text to search for art notes
+                const text = quill.getText();
+                
+                // We'll need to save any yellow background formatting first (for word highlighting)
+                let yellowHighlights = [];
+                if (currentHighlightedWord) {
+                    // Find all instances of the currently highlighted word
+                    const wordRegex = new RegExp(`\\b${currentHighlightedWord}\\b`, 'gi');
+                    let match;
+                    wordRegex.lastIndex = 0;
+                    
+                    while ((match = wordRegex.exec(text)) !== null) {
+                        yellowHighlights.push({
+                            index: match.index,
+                            length: match[0].length
+                        });
+                    }
+                }
+                
+                // Clear all existing art note formatting but preserve any other formatting
+                // This ensures text that was previously an art note but isn't anymore loses its formatting
+                quill.formatText(0, text.length, {
+                    'color': false,
+                    'italic': false,
+                    'background': false
+                });
+                
+                // Find art notes using improved function
+                const artNotes = findArtNotes(text);
+                
+                // Re-apply formatting to art notes that still exist
+                artNotes.forEach(note => {
+                    // Calculate length (end - start is the index difference, but we need length)
+                    const length = note.end - note.start + 1;
+                    
+                    try {
+                        quill.formatText(note.start, length, {
+                            'color': '#d9534f',
+                            'italic': true,
+                            'background': 'rgba(217, 83, 79, 0.1)'
+                        });
+                    } catch (e) {
+                        console.error('Error formatting art note:', e);
+                    }
+                });
+                
+                // Re-apply yellow highlights for words
+                yellowHighlights.forEach(highlight => {
+                    quill.formatText(highlight.index, highlight.length, {
+                        'background': 'yellow'
+                    });
+                });
             }
+
+
 
         //});
 
