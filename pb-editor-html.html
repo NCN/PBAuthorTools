@@ -121,29 +121,114 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="card">
+                    <div id="auth-panel" class="card">
                         <div class="card-body">
-                            <h4 class="card-title">Access the Tool</h4>
-                            <p>To use this tool, you need to subscribe to my newsletter.</p>
-                            <div class="mb-3">
-                                <input type="email" class="form-control" id="email-input" placeholder="Your email address">
-                            </div>
-                            <div class="d-grid">
-                                <button id="subscribe-button" class="btn btn-primary">
-                                    <i class="fas fa-envelope me-2"></i>Subscribe to Newsletter
+                          <h4 class="card-title">Access Picture Book Author Tools</h4>
+                          
+                          <!-- Login/Signup Tabs -->
+                          <ul class="nav nav-tabs mb-3" id="auth-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                              <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login-pane" type="button" role="tab">Log In</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                              <button class="nav-link" id="signup-tab" data-bs-toggle="tab" data-bs-target="#signup-pane" type="button" role="tab">Sign Up</button>
+                            </li>
+                          </ul>
+                          
+                          <!-- Tab Content -->
+                          <div class="tab-content" id="auth-tab-content">
+                            <!-- Login Pane -->
+                            <div class="tab-pane fade show active" id="login-pane" role="tabpanel">
+                              <form id="login-form">
+                                <div class="mb-3">
+                                  <label for="login-email" class="form-label">Email</label>
+                                  <input type="email" class="form-control" id="login-email" required>
+                                </div>
+                                <div class="mb-3">
+                                  <label for="login-password" class="form-label">Password</label>
+                                  <input type="password" class="form-control" id="login-password" required>
+                                </div>
+                                <div class="d-grid mb-3">
+                                  <button type="submit" class="btn btn-primary">Log In</button>
+                                </div>
+                                <div class="mb-3 text-center">
+                                  <small><a href="#" id="forgot-password-link">Forgot Password?</a></small>
+                                </div>
+                              </form>
+                              
+                              <div class="text-center mb-3">
+                                <small class="text-muted">Or log in with</small>
+                              </div>
+                              
+                              <div class="d-grid gap-2">
+                                <button id="google-login-btn" class="btn btn-outline-secondary">
+                                  <i class="fab fa-google me-2"></i>Continue with Google
                                 </button>
+                              </div>
                             </div>
-                            <p class="mt-3 small text-muted">Already subscribed? <a href="#" id="login-link">Login here</a></p>
                             
-                            <!-- Debug button -->
-                            <hr>
-                            <div class="d-grid">
-                                <button id="debug-login-button" class="btn btn-warning">
-                                    <i class="fas fa-bug me-2"></i>Skip Login (Demo Mode)
+                            <!-- Signup Pane -->
+                            <div class="tab-pane fade" id="signup-pane" role="tabpanel">
+                              <form id="signup-form">
+                                <div class="mb-3">
+                                  <label for="signup-email" class="form-label">Email</label>
+                                  <input type="email" class="form-control" id="signup-email" required>
+                                </div>
+                                <div class="mb-3">
+                                  <label for="signup-password" class="form-label">Password</label>
+                                  <input type="password" class="form-control" id="signup-password" required>
+                                </div>
+                                <div class="mb-3 form-check">
+                                  <input type="checkbox" class="form-check-input" id="newsletter-consent" checked>
+                                  <label class="form-check-label" for="newsletter-consent">
+                                    Subscribe to my newsletter for picture book writing tips and tool updates
+                                  </label>
+                                </div>
+                                <div class="d-grid mb-3">
+                                  <button type="submit" class="btn btn-primary">Create Account</button>
+                                </div>
+                              </form>
+                              
+                              <div class="text-center mb-3">
+                                <small class="text-muted">Or sign up with</small>
+                              </div>
+                              
+                              <div class="d-grid gap-2">
+                                <button id="google-signup-btn" class="btn btn-outline-secondary">
+                                  <i class="fab fa-google me-2"></i>Continue with Google
                                 </button>
+                              </div>
                             </div>
+                          </div>
+                          
+                          <div id="auth-message" class="mt-3"></div>
                         </div>
-                    </div>
+                      </div>
+                      
+                      <!-- Password Reset Modal -->
+                      <div class="modal fade" id="password-reset-modal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title">Reset Password</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <form id="reset-password-form">
+                                <div class="mb-3">
+                                  <label for="reset-email" class="form-label">Email Address</label>
+                                  <input type="email" class="form-control" id="reset-email" required>
+                                </div>
+                                <div id="reset-message"></div>
+                              </form>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                              <button type="button" class="btn btn-primary" id="reset-password-btn">Send Reset Link</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                 </div>
             </div>
         </div>
@@ -313,9 +398,27 @@
             <script src="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.2/dist/quill.min.js"><\/script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.4/d3.min.js"><\/script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.min.js"><\/script>
+            <!-- Firebase SDKs -->
+            <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"><\/script>
+            <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"><\/script>
+            <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"><\/script>
         `);
 
         document.addEventListener('DOMContentLoaded', function() {
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyDjl1-5F3IJ38TZZCK4IiW7PiapdEkTmI4",
+                authDomain: "pb-author-tools-542ca.firebaseapp.com",
+                projectId: "pb-author-tools-542ca",
+                storageBucket: "pb-author-tools-542ca.firebasestorage.app",
+                messagingSenderId: "847283609320",
+                appId: "1:847283609320:web:0349f755d64e89b277335d",
+                measurementId: "G-6P7RCTZ8NX"
+            };
+
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);  
+
             // Initialize Quill editor
             const quill = new Quill('#editor', {
                 theme: 'snow',
@@ -379,36 +482,42 @@
             ];
             
             // Function to show editor section
-            function showEditorSection() {
+            function showEditorSection(email) {
+                console.log("Showing editor section for", email);
                 document.getElementById('login-section').style.display = 'none';
                 document.getElementById('editor-section').style.display = 'block';
+                
+                // Add logout button
+                addLogoutButton();
             }
-
-            // Debug button that bypasses login
-            document.getElementById('debug-login-button').addEventListener('click', function() {
-                showEditorSection();
-            });
-
-            // Authentication handlers
-            document.getElementById('subscribe-button').addEventListener('click', function() {
-                const email = document.getElementById('email-input').value;
-                if (validateEmail(email)) {
-                    localStorage.setItem('pb-author-tools-email', email);
-                    showEditorSection();
-                } else {
-                    alert('Please enter a valid email address');
-                }
-            });
-
-            document.getElementById('login-link').addEventListener('click', function(e) {
-                e.preventDefault();
-                showEditorSection();
-            });
 
             // Check if user is already logged in
-            if (localStorage.getItem('pb-author-tools-email')) {
-                showEditorSection();
-            }
+            firebase.auth().onAuthStateChanged(function(user) {
+                if (user) {
+                    // User is signed in
+                    console.log("User signed in:", user.email);
+                    showEditorSection(user.email);
+                    
+                    // Check or create user document in Firestore
+                    const userRef = firebase.firestore().collection('users').doc(user.uid);
+                    userRef.get().then((doc) => {
+                    if (!doc.exists) {
+                        // Create new user document
+                        userRef.set({
+                        email: user.email,
+                        //newsletter_subscribed: true,
+                        signup_date: firebase.firestore.FieldValue.serverTimestamp(),
+                        //added_to_substack: false
+                        });
+                    }
+                    });
+                } else {
+                    // No user is signed in
+                    console.log("No user signed in");
+                    document.getElementById('login-section').style.display = 'block';
+                    document.getElementById('editor-section').style.display = 'none';
+                }
+            });        
 
             // Word cloud generation
             document.getElementById('generate-word-cloud').addEventListener('click', function() {
@@ -549,11 +658,6 @@
                 return sortedFreq;
             }
             
-            /*function removeArtNotes(text) {
-                // Remove art notes from text for word frequency analysis
-                return text.replace(bracketArtNoteRegex, ' ').replace(parenArtNoteRegex, ' ');
-            }*/
-
             function removeArtNotes(text) {
                 // Get art notes using the new function
                 const artNotes = findArtNotes(text);
@@ -977,6 +1081,204 @@
             document.querySelector('.editor-container').appendChild(testMultilineButton);
         });
 
+        document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Firebase Authentication
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // Email/Password Login
+        document.getElementById('login-form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            // Clear previous error messages
+            document.getElementById('auth-message').innerHTML = '';
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Logging in...';
+            
+            // Sign in with email and password
+            auth.signInWithEmailAndPassword(email, password)
+            .catch((error) => {
+                // Handle errors
+                let errorMessage = 'Login failed. Please check your email and password.';
+                if (error.code === 'auth/user-not-found') {
+                errorMessage = 'No account found with this email. Please sign up.';
+                } else if (error.code === 'auth/wrong-password') {
+                errorMessage = 'Incorrect password. Please try again or reset your password.';
+                }
+                
+                document.getElementById('auth-message').innerHTML = `
+                <div class="alert alert-danger">${errorMessage}</div>
+                `;
+                
+                // Reset button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            });
+        });
+        
+        // Email/Password Signup
+        document.getElementById('signup-form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const newsletter = document.getElementById('newsletter-consent').checked;
+            
+            // Clear previous error messages
+            document.getElementById('auth-message').innerHTML = '';
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating account...';
+            
+            // Create user with email and password
+            auth.createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                // Store user in database with newsletter preference
+                db.collection('users').doc(userCredential.user.uid).set({
+                email: email,
+                newsletter_subscribed: newsletter,
+                signup_date: firebase.firestore.FieldValue.serverTimestamp(),
+                added_to_substack: false
+                });
+            })
+            .catch((error) => {
+                // Handle errors
+                let errorMessage = 'Sign up failed. Please try again.';
+                if (error.code === 'auth/email-already-in-use') {
+                errorMessage = 'An account already exists with this email. Please log in instead.';
+                } else if (error.code === 'auth/weak-password') {
+                errorMessage = 'Password is too weak. Please use at least 6 characters.';
+                }
+                
+                document.getElementById('auth-message').innerHTML = `
+                <div class="alert alert-danger">${errorMessage}</div>
+                `;
+                
+                // Reset button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            });
+        });
+        
+        // Google Authentication
+        document.getElementById('google-login-btn')?.addEventListener('click', function() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            signInWithProvider(provider);
+        });
+        
+        document.getElementById('google-signup-btn')?.addEventListener('click', function() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            // Use the newsletter checkbox state from the signup form
+            const newsletter = document.getElementById('newsletter-consent').checked;
+            signInWithProvider(provider, newsletter);
+        });
+        
+        function signInWithProvider(provider, newsletter = true) {
+            auth.signInWithPopup(provider)
+            .then((result) => {
+                // Check if it's a new user
+                if (result.additionalUserInfo.isNewUser) {
+                // Store user in database with newsletter preference
+                db.collection('users').doc(result.user.uid).set({
+                    email: result.user.email,
+                    newsletter_subscribed: newsletter,
+                    signup_date: firebase.firestore.FieldValue.serverTimestamp(),
+                    added_to_substack: false
+                });
+                }
+            })
+            .catch((error) => {
+                console.error('Error during social authentication:', error);
+                document.getElementById('auth-message').innerHTML = `
+                <div class="alert alert-danger">Authentication failed. Please try a different method.</div>
+                `;
+            });
+        }
+        
+        // Password Reset
+        document.getElementById('forgot-password-link')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            const resetModal = new bootstrap.Modal(document.getElementById('password-reset-modal'));
+            resetModal.show();
+        });
+        
+        document.getElementById('reset-password-btn')?.addEventListener('click', function() {
+            const email = document.getElementById('reset-email').value;
+            if (!email) {
+            document.getElementById('reset-message').innerHTML = `
+                <div class="alert alert-danger">Please enter your email address.</div>
+            `;
+            return;
+            }
+            
+            // Show loading state
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+            
+            auth.sendPasswordResetEmail(email)
+            .then(() => {
+                document.getElementById('reset-message').innerHTML = `
+                <div class="alert alert-success">Password reset email sent! Check your inbox.</div>
+                `;
+                setTimeout(() => {
+                const resetModal = bootstrap.Modal.getInstance(document.getElementById('password-reset-modal'));
+                resetModal.hide();
+                }, 2000);
+            })
+            .catch((error) => {
+                let errorMessage = 'Failed to send reset email. Please try again.';
+                if (error.code === 'auth/user-not-found') {
+                errorMessage = 'No account found with this email.';
+                }
+                document.getElementById('reset-message').innerHTML = `
+                <div class="alert alert-danger">${errorMessage}</div>
+                `;
+            })
+            .finally(() => {
+                // Reset button
+                this.disabled = false;
+                this.innerHTML = 'Send Reset Link';
+            });
+        });
+        
+        // Logout button
+        //addLogoutButton();
+        });
+
+        // Add logout button
+        function addLogoutButton() {
+        if (!document.getElementById('logout-button')) {
+            const logoutButton = document.createElement('button');
+            logoutButton.id = 'logout-button';
+            logoutButton.className = 'btn btn-outline-secondary mt-3 w-100';
+            logoutButton.innerHTML = '<i class="fas fa-sign-out-alt me-2"></i>Logout';
+            
+            logoutButton.addEventListener('click', function() {
+            firebase.auth().signOut().then(() => {
+                document.getElementById('login-section').style.display = 'block';
+                document.getElementById('editor-section').style.display = 'none';
+            });
+            });
+            
+            // Add to the stats panel when user is logged in
+            firebase.auth().onAuthStateChanged(function(user) {
+            if (user && document.querySelector('.stats-panel')) {
+                document.querySelector('.stats-panel').appendChild(logoutButton);
+            }
+            });
+        }
+        }
+        
     </script>
 </body>
 </html>
