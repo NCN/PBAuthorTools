@@ -1148,12 +1148,75 @@
                 wordFrequencies.slice(0, 30).forEach(item => { // Show top 30
                     const listItem = document.createElement('div');
                     listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    listItem.style.cursor = 'pointer'; // Add cursor pointer
                     listItem.innerHTML = `
                         <span>${capitalizeFirstLetter(item.text)}</span>
                         <span class="badge bg-primary rounded-pill">${item.size}</span>
                     `;
+                    // Add hover effect
+                    listItem.addEventListener('mouseover', () => {
+                        listItem.style.backgroundColor = '#f8f9fa';
+                    });
+                    listItem.addEventListener('mouseout', () => {
+                        listItem.style.backgroundColor = '';
+                    });
+                    // Add click event for word highlighting
+                    listItem.addEventListener('click', () => {
+                        highlightWordInstances(item.text);
+                    });
                     container.appendChild(listItem);
                 });
+            }
+
+            // Add this variable outside of any function to track currently highlighted word
+            let currentHighlightedWord = null;
+
+            // Add this function to highlight word instances in the editor
+            function highlightWordInstances(word) {
+                // Clear previous highlights if different word
+                if (currentHighlightedWord !== word) {
+                    clearWordHighlights();
+                }
+                
+                currentHighlightedWord = word;
+                
+                // Get the text content
+                const text = quill.getText();
+                
+                // Create a regex to find all instances of the word with word boundaries
+                const wordRegex = new RegExp(`\\b${word}\\b`, 'gi');
+                
+                let match;
+                // Reset lastIndex
+                wordRegex.lastIndex = 0;
+                
+                // Find and highlight all instances
+                while ((match = wordRegex.exec(text)) !== null) {
+                    quill.formatText(match.index, match[0].length, {
+                        'background': 'yellow'
+                    });
+                }
+                
+                // Preserve art note formatting
+                highlightArtNotes();
+            }
+
+            // Add this function to clear word highlights
+            function clearWordHighlights() {
+                if (!currentHighlightedWord) return;
+                
+                // Get the full text length
+                const text = quill.getText();
+                
+                // Remove all yellow background formatting at once instead of iterating through Delta ops
+                quill.formatText(0, text.length, {
+                    'background': false
+                });
+                
+                currentHighlightedWord = null;
+                
+                // Re-apply art note highlighting
+                highlightArtNotes();
             }
             
             function generateWordCloud(words, containerId) {
@@ -1190,7 +1253,7 @@
                     .on("end", drawWordCloud)
                     .start();
                     
-                function drawWordCloud(words) {
+                /*function drawWordCloud(words) {
                     // Create SVG
                     const svg = d3.select(`#${containerId}`).append("svg")
                         .attr("width", width)
@@ -1208,6 +1271,29 @@
                         .attr("text-anchor", "middle")
                         .attr("transform", d => `translate(${d.x},${d.y}) rotate(${d.rotate})`)
                         .text(d => d.text);
+                }*/
+                function drawWordCloud(words) {
+                    // Create SVG
+                    const svg = d3.select(`#${containerId}`).append("svg")
+                        .attr("width", width)
+                        .attr("height", height)
+                        .append("g")
+                        .attr("transform", `translate(${width/2},${height/2})`);
+                        
+                    // Add words
+                    svg.selectAll("text")
+                        .data(words)
+                        .enter().append("text")
+                        .style("font-size", d => `${d.size}px`)
+                        .style("font-family", "Impact")
+                        .style("fill", () => d3.schemeCategory10[Math.floor(Math.random() * 10)])
+                        .style("cursor", "pointer") // Add cursor pointer
+                        .attr("text-anchor", "middle")
+                        .attr("transform", d => `translate(${d.x},${d.y}) rotate(${d.rotate})`)
+                        .text(d => d.text)
+                        .on("click", (event, d) => { // Add click event handler
+                            highlightWordInstances(d.text);
+                        });
                 }
             }
             
@@ -1257,7 +1343,7 @@
                 highlightArtNotes();
             }
             
-            function highlightArtNotes() {
+            /*function highlightArtNotes() {
                 // Get the text to search for art notes
                 const text = quill.getText();
                 
@@ -1280,6 +1366,53 @@
                     } catch (e) {
                         console.error('Error formatting art note:', e);
                     }
+                });
+            }*/
+
+            function highlightArtNotes() {
+                // Get the text to search for art notes
+                const text = quill.getText();
+                
+                // Find art notes using improved function
+                const artNotes = findArtNotes(text);
+                
+                // We'll need to save any yellow background formatting first
+                let yellowHighlights = [];
+                if (currentHighlightedWord) {
+                    // Find all instances of the currently highlighted word
+                    const wordRegex = new RegExp(`\\b${currentHighlightedWord}\\b`, 'gi');
+                    let match;
+                    wordRegex.lastIndex = 0;
+                    
+                    while ((match = wordRegex.exec(text)) !== null) {
+                        yellowHighlights.push({
+                            index: match.index,
+                            length: match[0].length
+                        });
+                    }
+                }
+                
+                // Apply formatting to art notes
+                artNotes.forEach(note => {
+                    // Calculate length (end - start is the index difference, but we need length)
+                    const length = note.end - note.start + 1;
+                    
+                    try {
+                        quill.formatText(note.start, length, {
+                            'color': '#d9534f',
+                            'italic': true,
+                            'background': 'rgba(217, 83, 79, 0.1)'
+                        });
+                    } catch (e) {
+                        console.error('Error formatting art note:', e);
+                    }
+                });
+                
+                // Re-apply yellow highlights for words
+                yellowHighlights.forEach(highlight => {
+                    quill.formatText(highlight.index, highlight.length, {
+                        'background': 'yellow'
+                    });
                 });
             }
             
@@ -1489,6 +1622,14 @@
                 this.disabled = false;
                 this.innerHTML = 'Send Reset Link';
             });
+        });
+
+        // Remove word highlighting when you close the word frequency accordion
+        document.getElementById('wordFrequencyCollapse').addEventListener('hidden.bs.collapse', function () {
+            clearWordHighlights();
+        });
+        document.getElementById('wordCloudCollapse').addEventListener('hidden.bs.collapse', function () {
+            clearWordHighlights();
         });
     
         });
