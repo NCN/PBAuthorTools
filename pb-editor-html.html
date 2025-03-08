@@ -143,6 +143,75 @@
             background-color: #e8f4ff;
             border-left: 4px solid #007bff;
         }
+
+    /* Playful and Creative Style (No Emoji) */
+    h1.fw-bold {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: 800;
+        color: #333;
+        border-bottom: 3px solid #ff813f;
+        padding-bottom: 6px;
+        display: inline-block; /* Makes the border only as wide as the text */
+    }
+
+    /* Optional: Add a subtle transition for hover effect */
+    h1.fw-bold {
+        transition: transform 0.2s ease, border-color 0.3s ease;
+    }
+
+    h1.fw-bold:hover {
+        border-color: #e56e2c; /* Slightly darker orange on hover */
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        h1.fw-bold {
+            padding-bottom: 4px;
+            border-bottom-width: 2px;
+        }
+    }
+        
+        /* Add this to your existing style section */
+        @media (max-width: 1024px) {
+            header.d-flex.justify-content-between {
+                flex-direction: column;
+                align-items: start !important;
+            }
+            
+            header.d-flex.justify-content-between > div {
+                margin-top: 0.75rem;
+                width: 100%;
+                justify-content: flex-start; /* Left align buttons */
+            }
+            
+            /* Button container */
+            header.d-flex.justify-content-between > div {
+                display: flex;
+                gap: 0.5rem;
+                align-items: stretch;
+            }
+            
+            /* Individual buttons */
+            header.d-flex.justify-content-between > div a.btn {
+                font-size: 0.9rem;
+                padding: 0.35rem 0.7rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 38px;
+                box-sizing: border-box;
+                flex: 0 0 auto; /* Don't expand to fill space */
+                max-width: 200px; /* Maximum width for buttons */
+            }
+        }
+
+        /* Adjust header elements alignment on small screens */
+        @media (max-width: 480px) {
+            header.d-flex.justify-content-between h1.fw-bold {
+                font-size: 1.25rem;
+                margin-bottom: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -499,7 +568,7 @@
 
         <!-- Footer -->
         <footer class="mt-5 pt-4 border-top">
-            <div class="row mb-4">
+            <div class="row mb-1">
                 <div class="col-12">
                     <h5>Created by Nathan Christopher 
                         <a href="https://hellonathan.ca/about/" class="btn btn-sm btn-outline-primary ms-2" target="_blank">
