@@ -712,7 +712,6 @@
                         fleschKincaidGradeLevel: 0,
                         fleschReadingEase: 0,
                         complexWordPercentage: 0,
-                        //readingEaseCategory: 'N/A',
                         schoolLevel: 'N/A'
                     };
                 }
@@ -737,18 +736,6 @@
                 const complexWords = words.filter(word => this.countSyllables(word) >= 3);
                 const complexWordPercentage = (complexWords.length / totalWords) * 100;
                 
-                // Reading ease category
-                //let readingEaseCategory = 'Unknown';
-                
-                // Flesch Reading Ease categorization
-                /*if (fleschReadingEase >= 90) readingEaseCategory = 'Very Easy';
-                else if (fleschReadingEase >= 80) readingEaseCategory = 'Easy';
-                else if (fleschReadingEase >= 70) readingEaseCategory = 'Fairly Easy';
-                else if (fleschReadingEase >= 60) readingEaseCategory = 'Standard';
-                else if (fleschReadingEase >= 50) readingEaseCategory = 'Fairly Difficult';
-                else if (fleschReadingEase >= 30) readingEaseCategory = 'Difficult';
-                else readingEaseCategory = 'Very Difficult';*/
-                
                 // School level based on Flesch Reading Ease
                 let schoolLevel = 'Unknown';
                 if (fleschReadingEase >= 90) schoolLevel = '5th Grade';
@@ -767,7 +754,6 @@
                     fleschKincaidGradeLevel: fleschKincaidGradeLevel.toFixed(1),
                     fleschReadingEase: fleschReadingEase.toFixed(1),
                     complexWordPercentage: complexWordPercentage.toFixed(1),
-                    //readingEaseCategory,
                     schoolLevel
                 };
             }
@@ -818,7 +804,6 @@
                 document.getElementById('flesch-kincaid-grade').textContent = results.fleschKincaidGradeLevel;
                 document.getElementById('flesch-reading-ease').textContent = results.fleschReadingEase;
                 document.getElementById('complex-word-percentage').textContent = results.complexWordPercentage + '%';
-                //document.getElementById('reading-ease-category').textContent = results.readingEaseCategory;
                 document.getElementById('school-level').textContent = results.schoolLevel;
                 
                 // Add helpful context based on the results
@@ -1129,12 +1114,6 @@
                 updateWordCounts();
             }, 100);
 
-            // Helper Functions
-            function validateEmail(email) {
-                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                return re.test(email);
-            }
-
             function getPlainTextFromEditor() {
                 // Get text directly from Quill
                 return quill.getText().trim();
@@ -1161,30 +1140,6 @@
 
             }
 
-            function getNestedArtNotes(text) {
-                const results = [];
-                const stack = [];
-                // Iterate over every character in the text.
-                for (let i = 0; i < text.length; i++) {
-                    if (text[i] === '[') {
-                        // Push the index of the opening bracket onto the stack.
-                        stack.push(i);
-                    } else if (text[i] === ']' && stack.length > 0) {
-                        // Pop the most recent opening bracket index.
-                        const start = stack.pop();
-                        // If the stack is empty, we have a top-level bracketed segment.
-                        if (stack.length === 0) {
-                            const segment = text.substring(start, i + 1);
-                            // Optionally ignore inline markers like [EC1] (letters and digits, no spaces)
-                            if (!/^\[[A-Za-z]+\d+\]$/.test(segment)) {
-                                results.push({ index: start, length: i - start + 1, text: segment });
-                            }
-                        }
-                    }
-                }
-                return results;
-            }
-            
             function getWordFrequencies(text) {
                 const words = getWordsFromText(text);
                 if (words.length === 0) {
@@ -1618,50 +1573,7 @@
                     });
                 });
             }
-            
-            function findAllMatches(text, regex) {
-                // Helper function to find all regex matches with their positions
-                const matches = [];
-                let match;
-                
-                // Create a new RegExp to reset lastIndex
-                const re = new RegExp(regex);
-                
-                while ((match = re.exec(text)) !== null) {
-                    matches.push({
-                        index: match.index,
-                        length: match[0].length,
-                        text: match[0]
-                    });
-                    
-                    // Avoid infinite loops with zero-length matches
-                    if (match.index === re.lastIndex) {
-                        re.lastIndex++;
-                    }
-                }
-                
-                return matches;
-            }
 
-            function mergeOverlappingMatches(matches) {
-                if (matches.length === 0) return [];
-                // Sort matches by their starting index
-                matches.sort((a, b) => a.index - b.index);
-                let merged = [];
-                let current = matches[0];
-                for (let i = 1; i < matches.length; i++) {
-                    let m = matches[i];
-                    // If the match is completely nested inside the current match, skip it.
-                    if (m.index >= current.index && (m.index + m.length) <= (current.index + current.length)) {
-                        continue;
-                    } else {
-                        merged.push(current);
-                        current = m;
-                    }
-                }
-                merged.push(current);
-                return merged;
-            }
         //});
 
         //document.addEventListener('DOMContentLoaded', function() {
