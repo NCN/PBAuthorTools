@@ -1869,51 +1869,44 @@
                 // Close the confirmation modal
                 confirmModal.hide();
                 
+                // Get the original text content and split into lines
+                const originalText = quill.getText();
+                const originalLines = originalText.split('\n');
+                
+                // Map art notes to their line numbers
+                const artNoteLines = mapArtNotesToLines(artNotes, originalText);
+                
                 // Sort art notes in reverse order (to avoid index shifting when removing)
                 artNotes.sort((a, b) => b.start - a.start);
                 
                 // Store current selection if any
                 const currentSelection = quill.getSelection();
                 
-                // Get the full text content
-                let contents = quill.getContents();
-                
-                // Track lines where we've removed art notes to check if they become empty
-                const affectedLineIndices = new Set();
-                
-                // Delete each art note, starting from the end
+                // Delete each art note
                 artNotes.forEach(note => {
-                    // Find line index for this art note
-                    const linePositions = getLineIndicesForRange(note.start, note.end);
-                    linePositions.forEach(idx => affectedLineIndices.add(idx));
-                    
-                    // Delete the art note
                     quill.deleteText(note.start, note.end - note.start + 1);
                 });
                 
-                // After deleting art notes, check affected lines to see if any are now empty
-                // and remove them if so
-                removeEmptyLines(Array.from(affectedLineIndices));
-                
-                // Restore selection if applicable
-                if (currentSelection) {
-                    // Adjust selection position if needed based on deletions
-                    let adjustedIndex = currentSelection.index;
-                    artNotes.forEach(note => {
-                        if (note.start < currentSelection.index) {
-                            adjustedIndex -= (note.end - note.start + 1);
-                        }
-                    });
+                // After deleting art notes, check which lines contained ONLY art notes
+                setTimeout(() => {
+                    // Get updated text content
+                    const updatedText = quill.getText();
+                    const updatedLines = updatedText.split('\n');
                     
-                    // Ensure index is not negative
-                    adjustedIndex = Math.max(0, adjustedIndex);
+                    // Find lines that became empty due to art note removal
+                    cleanupEmptyArtNoteLines(originalLines, updatedLines, artNoteLines);
                     
-                    // Set selection
-                    quill.setSelection(adjustedIndex, 0);
-                }
-                
-                // Update word counts and other stats
-                updateWordCounts();
+                    // Update word counts and other stats
+                    updateWordCounts();
+                    
+                    // Restore selection if applicable
+                    if (currentSelection) {
+                        // Get updated content to calculate proper position
+                        const finalText = quill.getText();
+                        const adjustedIndex = Math.min(currentSelection.index, finalText.length - 1);
+                        quill.setSelection(Math.max(0, adjustedIndex), 0);
+                    }
+                }, 0);
                 
                 // Show success message with appropriate singular/plural
                 document.getElementById('success-delete-text').textContent = 
@@ -1927,58 +1920,105 @@
             };
         });
 
-        // Function to get line indices for a range
-        function getLineIndicesForRange(startIndex, endIndex) {
-            const lines = new Set();
+        // Maps art notes to their line numbers in the text
+        function mapArtNotesToLines(artNotes, text) {
+            const lines = text.split('\n');
+            const artNoteLines = {};
             
-            // Get text and split into lines
-            const text = quill.getText();
-            const textLines = text.split('\n');
-            
-            // Find which lines the range falls within
-            let charCounter = 0;
-            for (let i = 0; i < textLines.length; i++) {
-                const lineLength = textLines[i].length + 1; // +1 for the newline character
-                const lineStart = charCounter;
-                const lineEnd = charCounter + lineLength - 1;
+            // Create a map to track which lines contain art notes
+            let charPos = 0;
+            for (let i = 0; i < lines.length; i++) {
+                const lineEndPos = charPos + lines[i].length;
                 
-                // Check if this line overlaps with our range
-                if (!(endIndex < lineStart || startIndex > lineEnd)) {
-                    lines.add(i);
+                // Check each art note to see if it falls on this line
+                for (const note of artNotes) {
+                    // If the art note overlaps with this line
+                    if (note.start <= lineEndPos && note.end >= charPos) {
+                        // Store what percentage of the line is occupied by the art note
+                        const lineLength = lines[i].length;
+                        
+                        // Calculate overlap
+                        const overlapStart = Math.max(note.start, charPos);
+                        const overlapEnd = Math.min(note.end, lineEndPos);
+                        const overlapLength = overlapEnd - overlapStart + 1;
+                        
+                        // Calculate coverage percentage
+                        const coverage = lineLength > 0 ? (overlapLength / lineLength) : 0;
+                        
+                        if (!artNoteLines[i]) {
+                            artNoteLines[i] = { 
+                                lineContent: lines[i],
+                                notes: [],
+                                totalCoverage: 0
+                            };
+                        }
+                        
+                        artNoteLines[i].notes.push({
+                            start: Math.max(0, note.start - charPos),
+                            end: Math.min(lineLength, note.end - charPos),
+                            coverage: coverage
+                        });
+                        
+                        artNoteLines[i].totalCoverage += coverage;
+                    }
                 }
                 
-                charCounter += lineLength;
+                // Move to the next line (add 1 for the newline character)
+                charPos = lineEndPos + 1;
             }
             
-            return Array.from(lines);
+            return artNoteLines;
         }
 
-        // Function to check for and remove empty lines
-        function removeEmptyLines(lineIndices) {
-            // Work from bottom to top to avoid index shifting issues
-            lineIndices.sort((a, b) => b - a);
+        // Cleans up lines that were entirely (or almost entirely) art notes
+        function cleanupEmptyArtNoteLines(originalLines, updatedLines, artNoteLines) {
+            // Counter to track line position shifts
+            let lineOffset = 0;
             
-            for (const lineIndex of lineIndices) {
-                const line = quill.getLine(lineIndex);
+            // Check each line that had art notes
+            for (const lineNum in artNoteLines) {
+                const lineIdx = parseInt(lineNum);
+                const lineInfo = artNoteLines[lineNum];
                 
-                // Skip if line is undefined (can happen with complex formatting)
-                if (!line || !line[0]) continue;
-                
-                // Get the line's text content
-                const lineText = line[0].text();
-                
-                // If the line is empty or just whitespace, delete it
-                if (lineText.trim() === '') {
-                    // The line index gives us the position in the document
-                    const index = quill.getIndex(line[0]);
-                    const length = line[0].length();
+                // Check if this line had high art note coverage (>90%)
+                if (lineInfo.totalCoverage > 0.9) {
+                    // Adjust for previous deletions
+                    const adjustedLineIdx = lineIdx - lineOffset;
                     
-                    if (length > 0) {
-                        quill.deleteText(index, length);
+                    // Make sure the line index is valid
+                    if (adjustedLineIdx >= 0 && adjustedLineIdx < updatedLines.length) {
+                        // Check if the line is now empty or just whitespace
+                        if (updatedLines[adjustedLineIdx].trim() === '') {
+                            // Calculate the position of this line in the document
+                            let position = 0;
+                            for (let i = 0; i < adjustedLineIdx; i++) {
+                                position += updatedLines[i].length + 1; // +1 for newline
+                            }
+                            
+                            // Delete the empty line (including its newline)
+                            if (adjustedLineIdx < updatedLines.length - 1) {
+                                // Not the last line - delete line and newline
+                                quill.deleteText(position, updatedLines[adjustedLineIdx].length + 1);
+                            } else if (adjustedLineIdx > 0) {
+                                // Last line - delete the preceding newline and the line
+                                quill.deleteText(position - 1, updatedLines[adjustedLineIdx].length + 1);
+                            } else {
+                                // First and only line - just delete content
+                                quill.deleteText(position, updatedLines[adjustedLineIdx].length);
+                            }
+                            
+                            // Increment offset for subsequent lines
+                            lineOffset++;
+                            
+                            // Update the updated lines array after deletion
+                            updatedLines.splice(adjustedLineIdx, 1);
+                        }
                     }
                 }
             }
         }
+
+        
         
 
         });
