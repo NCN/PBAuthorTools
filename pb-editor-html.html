@@ -18,6 +18,21 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 20px;
             margin-bottom: 20px;
+            /* Set minimum height to match the height of the right panel */
+            min-height: 525px; /* Adjust this value as needed */
+            display: flex;
+            flex-direction: column;
+        }
+        /* Adjust the Quill editor to fill the available space */
+        .ql-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .ql-editor {
+            flex-grow: 1;
+            min-height: 300px; /* Set minimum height for the editor itself */
+            max-height: none; /* Override the existing max-height property */
         }
         .stats-panel {
             background-color: #f0f7ff;
