@@ -111,9 +111,9 @@
                     <p>This tool helps picture book authors analyze their manuscripts, count words, and highlight art notes.</p>
                     <ul class="list-group list-group-flush mb-3">
                         <li class="list-group-item bg-transparent"><i class="fas fa-check-circle text-success me-2"></i>Count words (excluding art notes)</li>
-                        <li class="list-group-item bg-transparent"><i class="fas fa-check-circle text-success me-2"></i>Highlight art notes automatically</li>
+                        <li class="list-group-item bg-transparent"><i class="fas fa-check-circle text-success me-2"></i>Detect and highlight art notes automatically</li>
                         <li class="list-group-item bg-transparent"><i class="fas fa-check-circle text-success me-2"></i>Generate word clouds and frequency lists</li>
-                        <li class="list-group-item bg-transparent"><i class="fas fa-check-circle text-success me-2"></i>Detect adverbs and problematic rhyming words</li>
+                        <li class="list-group-item bg-transparent"><i class="fas fa-check-circle text-success me-2"></i>Count adverbs and detect problematic rhyming words</li>
                     </ul>
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle me-2"></i>
@@ -123,8 +123,12 @@
                 <div class="col-md-6">
                     <div id="auth-panel" class="card">
                         <div class="card-body">
-                          <h4 class="card-title">Access Picture Book Author Tools</h4>
-                          
+                          <!--<h4 class="card-title">Access Picture Book Author Tools</h4>-->
+                          <div class="alert alert-info mb-3">
+                            <i class="fas fa-check-circle me-2 text-success"></i>
+                            By using this tool, you agree to be subscribed to <a href="https://hellonathan.substack.com/" target="_blank" class="alert-link">Nathan Christopher's free Substack newsletter</a>
+                          </div>
+
                           <!-- Login/Signup Tabs -->
                           <ul class="nav nav-tabs mb-3" id="auth-tabs" role="tablist">
                             <li class="nav-item" role="presentation">
@@ -169,6 +173,10 @@
                             
                             <!-- Signup Pane -->
                             <div class="tab-pane fade" id="signup-pane" role="tabpanel">
+                              <!--<div class="alert alert-info mb-3">
+                                <i class="fas fa-check-circle me-2 text-success"></i>
+                                By creating an account, you agree to be subscribed to <a href="https://hellonathan.substack.com/" target="_blank" class="alert-link">Nathan Christopher's free Substack newsletter</a>
+                              </div>-->
                               <form id="signup-form">
                                 <div class="mb-3">
                                   <label for="signup-email" class="form-label">Email</label>
@@ -178,57 +186,16 @@
                                   <label for="signup-password" class="form-label">Password</label>
                                   <input type="password" class="form-control" id="signup-password" required>
                                 </div>
-                                <div class="mb-3 form-check">
-                                  <input type="checkbox" class="form-check-input" id="newsletter-consent" checked>
-                                  <label class="form-check-label" for="newsletter-consent">
-                                    Subscribe to my newsletter for picture book writing tips and tool updates
-                                  </label>
-                                </div>
                                 <div class="d-grid mb-3">
                                   <button type="submit" class="btn btn-primary">Create Account</button>
                                 </div>
                               </form>
-                              
-                              <div class="text-center mb-3">
-                                <small class="text-muted">Or sign up with</small>
-                              </div>
-                              
-                              <div class="d-grid gap-2">
-                                <button id="google-signup-btn" class="btn btn-outline-secondary">
-                                  <i class="fab fa-google me-2"></i>Continue with Google
-                                </button>
-                              </div>
                             </div>
                           </div>
                           
                           <div id="auth-message" class="mt-3"></div>
                         </div>
-                      </div>
-                      
-                      <!-- Password Reset Modal -->
-                      <div class="modal fade" id="password-reset-modal" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h5 class="modal-title">Reset Password</h5>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                              <form id="reset-password-form">
-                                <div class="mb-3">
-                                  <label for="reset-email" class="form-label">Email Address</label>
-                                  <input type="email" class="form-control" id="reset-email" required>
-                                </div>
-                                <div id="reset-message"></div>
-                              </form>
-                            </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                              <button type="button" class="btn btn-primary" id="reset-password-btn">Send Reset Link</button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -239,7 +206,7 @@
                 <div class="col-md-8">
                     <div class="editor-container">
                         <!--<h4>Picture Book Manuscript</h4>-->
-                        <p class="text-muted small">Paste your text below. Art notes will be automatically highlighted.</p>
+                        <p class="text-muted small">Paste your text below. Art notes will be highlighted automatically.</p>
                         <div id="editor"></div>
                         <p class="privacy-notice mt-2">
                             <i class="fas fa-shield-alt me-1"></i> Your manuscript never leaves your browser. No text is sent to our servers or stored.
@@ -536,16 +503,14 @@
             // Adverb detection
             document.getElementById('detect-adverbs').addEventListener('click', function() {
                 const text = getPlainTextFromEditor();
-                const words = getWordsFromText(text);
-                const adverbsFound = detectSpecialWords(words, adverbList);
+                const adverbsFound = detectSpecialWords(text, adverbList);
                 displaySpecialWordsList(adverbsFound, 'adverbs-list', 'Adverbs');
             });
 
             // Problematic rhyme words detection
             document.getElementById('detect-rhyme-words').addEventListener('click', function() {
                 const text = getPlainTextFromEditor();
-                const words = getWordsFromText(text);
-                const rhymeWordsFound = detectSpecialWords(words, problematicRhymeWords);
+                const rhymeWordsFound = detectSpecialWords(text, problematicRhymeWords);
                 displaySpecialWordsList(rhymeWordsFound, 'rhyme-words-list', 'Syllabically ambiguous words');
             });
 
@@ -763,7 +728,13 @@
                 return artNotes;
             }
             
-            function detectSpecialWords(words, wordList) {
+            function detectSpecialWords(text, wordList) {
+                // Remove art notes from the text first
+                const textWithoutArtNotes = removeArtNotes(text);
+                
+                // Get words from the text without art notes
+                const words = getWordsFromText(textWithoutArtNotes);
+                
                 // Find words from the provided list in the text
                 const specialWordsFound = {};
                 
@@ -1000,50 +971,12 @@
 
             
             // Add sample book text button for testing
-            const sampleButton = document.createElement('button');
+            /*const sampleButton = document.createElement('button');
             sampleButton.className = 'btn btn-sm btn-secondary mt-2';
             sampleButton.textContent = 'Insert Sample Text';
             sampleButton.addEventListener('click', function() {
                 quill.setText('');
-                quill.insertText(0, `THE CLOCK KEEPER
-
-        Poppy the porcupine likes to be organized.
-        [Art note: Poppy is moving around his room, 
-        everything is tidy and organized, lots of clocks on the walls]
-
-        Every morning, he rises with the sun
-        And every night, he goes to bed at half-past-eight.
-        (Art note: We see Poppy in bed with small bedside clock showing 8:30)
-
-        He has clocks on all the walls.
-        He has watches in all his drawers.
-        Poppy's job as the forest's Clock Keeper is very important!
-
-        [Art note: Poppy is walking around 
-        the forest, wearing several watches, carrying a 
-        toolbox and helping animals with their clocks]
-
-        Without him, the rabbits would be late for school,
-        The owls would miss their evening flights,
-        And the beaver's dam would never get built on time.
-
-        "One o'clock! Time for lunch," Poppy calls.
-        "Four o'clock! Time for afternoon tea," he announces.
-        "Eight o'clock! Time to prepare for bed," he reminds everyone.
-
-        But one day, something terrible happens.
-        [Art note: close-up of Poppy looking shocked, holding a broken clock]
-
-        Poppy's favorite clock stops ticking.
-
-        He winds it up. Tick... tock... tick... silence.
-        He taps it gently. Tick... tock... silence.
-        He even gives it a little shake. Silence.
-
-        "Oh no!" cries Poppy. "If my clock won't work, 
-        how will I know when it's time for anything?"
-
-        [Poppy running frantically through the forest, looking panicked]`);
+                quill.insertText(0, `THE nicked]`);
                 
                 setTimeout(function() {
                     updateWordCounts();
@@ -1057,24 +990,12 @@
             testMultilineButton.addEventListener('click', function() {
                 // Insert text with various multi-line art notes
                 quill.setText('');
-                quill.insertText(0, `Multi-line Art Note Test
-
-        [This is a multi-line
-        art note that spans
-        several lines]
-
-        Regular text here.
-
-        (Art note: This is another multi-line
-        art note that uses parentheses
-        and has multiple lines)
-
-        End of test.`);
+                quill.insertText(0, `Multi-litest.`);
                 
                 setTimeout(function() {
                     updateWordCounts();
                 }, 100);
-            });
+            });*/
             
             // Add the buttons after the editor
             document.querySelector('.editor-container').appendChild(sampleButton);
@@ -1129,7 +1050,7 @@
             
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
-            const newsletter = document.getElementById('newsletter-consent').checked;
+            //const newsletter = document.getElementById('newsletter-consent').checked;
             
             // Clear previous error messages
             document.getElementById('auth-message').innerHTML = '';
@@ -1146,9 +1067,9 @@
                 // Store user in database with newsletter preference
                 db.collection('users').doc(userCredential.user.uid).set({
                 email: email,
-                newsletter_subscribed: newsletter,
+                //newsletter_subscribed: newsletter,
                 signup_date: firebase.firestore.FieldValue.serverTimestamp(),
-                added_to_substack: false
+                //added_to_substack: false
                 });
             })
             .catch((error) => {
@@ -1176,12 +1097,12 @@
             signInWithProvider(provider);
         });
         
-        document.getElementById('google-signup-btn')?.addEventListener('click', function() {
+        /*document.getElementById('google-signup-btn')?.addEventListener('click', function() {
             const provider = new firebase.auth.GoogleAuthProvider();
             // Use the newsletter checkbox state from the signup form
             const newsletter = document.getElementById('newsletter-consent').checked;
             signInWithProvider(provider, newsletter);
-        });
+        });*/
         
         function signInWithProvider(provider, newsletter = true) {
             auth.signInWithPopup(provider)
@@ -1256,27 +1177,72 @@
         });
 
         // Add logout button
-        function addLogoutButton() {
-        if (!document.getElementById('logout-button')) {
-            const logoutButton = document.createElement('button');
-            logoutButton.id = 'logout-button';
-            logoutButton.className = 'btn btn-outline-secondary mt-3 w-100';
-            logoutButton.innerHTML = '<i class="fas fa-sign-out-alt me-2"></i>Logout';
-            
-            logoutButton.addEventListener('click', function() {
-            firebase.auth().signOut().then(() => {
-                document.getElementById('login-section').style.display = 'block';
-                document.getElementById('editor-section').style.display = 'none';
-            });
-            });
-            
-            // Add to the stats panel when user is logged in
-            firebase.auth().onAuthStateChanged(function(user) {
-            if (user && document.querySelector('.stats-panel')) {
-                document.querySelector('.stats-panel').appendChild(logoutButton);
+        /*function addLogoutButton() {
+            if (!document.getElementById('logout-button')) {
+                const logoutButton = document.createElement('button');
+                logoutButton.id = 'logout-button';
+                logoutButton.className = 'btn btn-outline-secondary mt-3 w-100';
+                logoutButton.innerHTML = '<i class="fas fa-sign-out-alt me-2"></i>Logout';
+                
+                logoutButton.addEventListener('click', function() {
+                firebase.auth().signOut().then(() => {
+                    document.getElementById('login-section').style.display = 'block';
+                    document.getElementById('editor-section').style.display = 'none';
+                });
+                });
+                
+                // Add to the stats panel when user is logged in
+                firebase.auth().onAuthStateChanged(function(user) {
+                if (user && document.querySelector('.stats-panel')) {
+                    document.querySelector('.stats-panel').appendChild(logoutButton);
+                }
+                });
             }
+        }*/
+
+        function addLogoutButton() {
+            const headerDiv = document.querySelector('header > div');
+            
+            // Remove any previous authentication state listeners
+            if (window.authStateUnsubscribe) {
+                window.authStateUnsubscribe();
+            }
+
+            // Create a single logout button
+            let logoutButton = document.getElementById('logout-button');
+            if (!logoutButton) {
+                logoutButton = document.createElement('button');
+                logoutButton.id = 'logout-button';
+                logoutButton.className = 'btn btn-outline-secondary ms-2';
+                logoutButton.addEventListener('click', function() {
+                    firebase.auth().signOut().then(() => {
+                        document.getElementById('login-section').style.display = 'block';
+                        document.getElementById('editor-section').style.display = 'none';
+                    });
+                });
+            }
+
+            // Set up the authentication state listener
+            window.authStateUnsubscribe = firebase.auth().onAuthStateChanged(function(user) {
+                // Remove any existing logout buttons first
+                const existingButtons = headerDiv.querySelectorAll('#logout-button');
+                existingButtons.forEach(btn => headerDiv.removeChild(btn));
+
+                if (user) {
+                    // Update button text and append 
+                    const username = user.email.split('@')[0];
+                    logoutButton.innerHTML = `<i class="fas fa-sign-out-alt me-2"></i>${username} (Logout)`;
+                    headerDiv.appendChild(logoutButton);
+                } else {
+                    // Reset the login form submit button when logged out
+                    const loginForm = document.getElementById('login-form');
+                    if (loginForm) {
+                        const submitBtn = loginForm.querySelector('button[type="submit"]');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = 'Log In';
+                    }
+                }
             });
-        }
         }
         
     </script>
