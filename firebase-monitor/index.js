@@ -15,13 +15,19 @@ const EMAIL_TO = 'nathanchristopherbooks@gmail.com';
 
 exports.handler = async (event) => {
   try {
-    // Collections to monitor
-    const collections = ['users', 'feature_suggestions'];
+    // Collections to monitor with their timestamp field names
+    const collections = [
+      { name: 'users', timestampField: 'signup_date' },
+      { name: 'feature_suggestions', timestampField: 'timestamp' }
+    ];
     let hasNewEntries = false;
     let emailBody = 'New entries in your Firebase database:\n\n';
     
     // Check each collection for new entries
-    for (const collectionName of collections) {
+    for (const collection of collections) {
+      const collectionName = collection.name;
+      const timestampField = collection.timestampField;
+      
       // Get last check time from DynamoDB
       const lastCheckData = await dynamoDB.get({
         TableName: 'FirebaseLastChecked',
@@ -36,8 +42,8 @@ exports.handler = async (event) => {
       
       // Query Firestore for new entries
       const query = db.collection(collectionName)
-        .where('timestamp', '>', admin.firestore.Timestamp.fromDate(lastCheckDate))
-        .orderBy('timestamp', 'desc');
+        .where(timestampField, '>', admin.firestore.Timestamp.fromDate(lastCheckDate))
+        .orderBy(timestampField, 'desc');
       
       const snapshot = await query.get();
       
@@ -52,13 +58,13 @@ exports.handler = async (event) => {
           
           // Format the entry differently based on collection
           if (collectionName === 'users') {
-            emailBody += `User: ${data.email}\n`;
-            emailBody += `Signed up: ${data.timestamp?.toDate().toISOString()}\n\n`;
+            emailBody += `User: ${data.email || 'Unknown'}\n`;
+            emailBody += `Signed up: ${data[timestampField]?.toDate().toISOString() || 'Unknown'}\n\n`;
           } else if (collectionName === 'feature_suggestions') {
-            emailBody += `Title: ${data.title}\n`;
-            emailBody += `From: ${data.userEmail}\n`;
-            emailBody += `Description: ${data.description}\n`;
-            emailBody += `Submitted: ${data.timestamp?.toDate().toISOString()}\n\n`;
+            emailBody += `Title: ${data.title || 'No title'}\n`;
+            emailBody += `From: ${data.userEmail || 'Unknown'}\n`;
+            emailBody += `Description: ${data.description || 'No description'}\n`;
+            emailBody += `Submitted: ${data[timestampField]?.toDate().toISOString() || 'Unknown'}\n\n`;
           }
         });
       }
@@ -82,7 +88,7 @@ exports.handler = async (event) => {
     }
   } catch (error) {
     console.error('Error:', error);
-    return { statusCode: 500, body: 'Error checking for new entries' };
+    return { statusCode: 500, body: `Error checking for new entries: ${error.message}` };
   }
 };
 
