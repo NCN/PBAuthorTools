@@ -4,14 +4,12 @@ A web-based application that helps picture book authors analyze their manuscript
 
 ## Architecture Overview
 
-![Architecture Diagram](https://your-repo-url.com/assets/architecture-diagram.png)
-
 This project uses a modern, serverless architecture with several interconnected components:
 
 ### 1. Web Application (Frontend)
 
 - **Technology**: HTML, CSS, JavaScript, Bootstrap 5, Quill.js editor
-- **Hosting**: GitHub Pages with custom subdomain (`pb-author-tools.hellonathan.ca`)
+- **Hosting**: GitHub Pages with custom subdomain (`pbtools.hellonathan.ca`)
 - **Key Features**:
   - Rich text editor for manuscript editing
   - Real-time word count and art note detection
@@ -48,7 +46,7 @@ This project uses a modern, serverless architecture with several interconnected 
 ### 4. DNS & Domain Configuration
 
 - **Primary Domain**: `hellonathan.ca` 
-- **Subdomain**: `pb-author-tools.hellonathan.ca`
+- **Subdomain**: `pbtools.hellonathan.ca`
 - **DNS Configuration**:
   - CNAME record pointing to GitHub Pages
   - TXT records for domain verification
@@ -75,7 +73,6 @@ This project uses a modern, serverless architecture with several interconnected 
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/pb-author-tools.git
 
 # Navigate to the project directory
 cd pb-author-tools
@@ -120,16 +117,9 @@ The Lambda function (`firebase-monitor/index.js`) serves as a bridge between Fir
 - Firebase Authentication provides secure user management
 - AWS Lambda function uses IAM role with least privilege
 
-## Future Enhancements
-
-- Integration with Google Docs via Add-on
-- Export functionality to common formats
-- Additional manuscript analysis tools
-- Enhanced visualization options
-
 ## License
 
-This project is licensed under the ISC License - see the LICENSE file for details.
+See the LICENSE file for details.
 
 ## Author
 
