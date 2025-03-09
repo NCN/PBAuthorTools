@@ -171,47 +171,95 @@
         }
     }
         
-        /* Add this to your existing style section */
-        @media (max-width: 1024px) {
-            header.d-flex.justify-content-between {
-                flex-direction: column;
-                align-items: start !important;
-            }
-            
-            header.d-flex.justify-content-between > div {
-                margin-top: 0.75rem;
-                width: 100%;
-                justify-content: flex-start; /* Left align buttons */
-            }
-            
-            /* Button container */
-            header.d-flex.justify-content-between > div {
-                display: flex;
-                gap: 0.5rem;
-                align-items: stretch;
-            }
-            
-            /* Individual buttons */
-            header.d-flex.justify-content-between > div a.btn {
-                font-size: 0.9rem;
-                padding: 0.35rem 0.7rem;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                min-height: 38px;
-                box-sizing: border-box;
-                flex: 0 0 auto; /* Don't expand to fill space */
-                max-width: 200px; /* Maximum width for buttons */
-            }
+    /* Add this to your existing style section */
+    @media (max-width: 1224px) {
+        header.d-flex.justify-content-between {
+            flex-direction: column;
+            align-items: start !important;
         }
+        
+        header.d-flex.justify-content-between > div {
+            margin-top: 0.75rem;
+            width: 100%;
+            justify-content: flex-start; /* Left align buttons */
+        }
+        
+        /* Button container */
+        header.d-flex.justify-content-between > div {
+            display: flex;
+            gap: 0.5rem;
+            align-items: stretch;
+        }
+        
+        /* Individual buttons */
+        header.d-flex.justify-content-between > div a.btn {
+            font-size: 0.9rem;
+            padding: 0.35rem 0.7rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 38px;
+            box-sizing: border-box;
+            flex: 0 0 auto; /* Don't expand to fill space */
+            max-width: 200px; /* Maximum width for buttons */
+        }
+    }
 
-        /* Adjust header elements alignment on small screens */
-        @media (max-width: 480px) {
-            header.d-flex.justify-content-between h1.fw-bold {
-                font-size: 1.25rem;
-                margin-bottom: 0;
-            }
+    /* Adjust header elements alignment on small screens */
+    @media (max-width: 480px) {
+        header.d-flex.justify-content-between h1.fw-bold {
+            font-size: 1.25rem;
+            margin-bottom: 0;
         }
+    }
+
+
+    /* Default state - show full text, hide short text */
+    .suggest-short-text {
+        display: none;
+    }
+
+    .suggest-full-text {
+        display: inline;
+    }
+
+    /* On smaller screens, swap visibility */
+    @media (max-width: 768px) {
+        .suggest-short-text {
+            display: inline;
+        }
+        
+        .suggest-full-text {
+            display: none;
+        }
+    }
+
+    /* Make button more compact on very small screens */
+    @media (max-width: 480px) {
+        #suggest-feature-btn {
+            padding: 0.35rem 0.7rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    /* Logout button responsive styling */
+    .logout-short-text {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .username-text, .logout-text {
+            display: none;
+        }
+        
+        .logout-short-text {
+            display: inline;
+        }
+        
+        #logout-button {
+            padding: 0.35rem 0.7rem;
+        }
+    }
     </style>
 </head>
 <body>
@@ -225,6 +273,11 @@
                 <a href="https://buymeacoffee.com/hellonathanc" class="btn btn-donate ms-2" target="_blank">
                     <i class="fas fa-mug-hot me-2"></i>Buy Me a Coffee
                 </a>
+                <button id="suggest-feature-btn" class="btn btn-primary ms-2">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    <span class="suggest-full-text">Suggest a Feature!</span>
+                    <span class="suggest-short-text">Suggest!</span>
+                </button>
             </div>
         </header>
 
@@ -739,6 +792,34 @@
         </div>
     </div>
 
+    <div class="modal fade" id="featureSuggestionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Suggest a Feature</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="feature-suggestion-form">
+                        <div class="mb-3">
+                            <label for="feature-title" class="form-label">Feature Title</label>
+                            <input type="text" class="form-control" id="feature-title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="feature-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="feature-description" rows="4" required></textarea>
+                        </div>
+                        <div id="suggestion-message"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="submit-feature-btn">Submit Suggestion</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Add your JavaScript functions here -->
     <script>
         // Load scripts
@@ -1025,6 +1106,83 @@
                     }
                 },
                 placeholder: 'Paste your picture book manuscript here...'
+            });
+
+            // Feature suggestion modal handling
+            document.getElementById('suggest-feature-btn')?.addEventListener('click', function() {
+                const featureModal = new bootstrap.Modal(document.getElementById('featureSuggestionModal'));
+                featureModal.show();
+            });
+
+            // Feature suggestion submission
+            document.getElementById('submit-feature-btn')?.addEventListener('click', function() {
+                const featureTitle = document.getElementById('feature-title').value;
+                const featureDescription = document.getElementById('feature-description').value;
+                
+                if (!featureTitle || !featureDescription) {
+                    document.getElementById('suggestion-message').innerHTML = `
+                        <div class="alert alert-danger">Please fill in all fields.</div>
+                    `;
+                    return;
+                }
+                
+                // Show loading state
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+                
+                // Get current user
+                const user = firebase.auth().currentUser;
+                
+                // Create the suggestion document
+                firebase.firestore().collection('feature_suggestions').add({
+                    title: featureTitle,
+                    description: featureDescription,
+                    userEmail: user ? user.email : 'Anonymous',
+                    userId: user ? user.uid : null,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'new',
+                    viewed: false
+                })
+                .then(() => {
+                    // Show success message
+                    document.getElementById('suggestion-message').innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Thank you for your suggestion! We'll review it soon.
+                        </div>
+                    `;
+                    
+                    // Clear form
+                    document.getElementById('feature-title').value = '';
+                    document.getElementById('feature-description').value = '';
+                    
+                    // Reset button after short delay
+                    setTimeout(() => {
+                        this.disabled = false;
+                        this.innerHTML = 'Submit Suggestion';
+                        
+                        // Close modal after showing success message
+                        setTimeout(() => {
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('featureSuggestionModal'));
+                            modal.hide();
+                        }, 550);
+                    }, 500);
+                })
+                .catch((error) => {
+                    console.error('Error submitting suggestion:', error);
+                    
+                    // Show error message
+                    document.getElementById('suggestion-message').innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Something went wrong. Please try again.
+                        </div>
+                    `;
+                    
+                    // Reset button
+                    this.disabled = false;
+                    this.innerHTML = 'Submit Suggestion';
+                });
             });
 
             // Art note detection regex patterns
@@ -2216,9 +2374,14 @@
                 existingButtons.forEach(btn => headerDiv.removeChild(btn));
 
                 if (user) {
-                    // Update button text and append 
+                    // Update button text with spans for responsive layout
                     const username = user.email.split('@')[0];
-                    logoutButton.innerHTML = `<i class="fas fa-sign-out-alt me-2"></i>${username} (Logout)`;
+                    logoutButton.innerHTML = `
+                        <i class="fas fa-sign-out-alt me-2"></i>
+                        <span class="username-text">${username}</span>
+                        <span class="logout-text"> (Logout)</span>
+                        <span class="logout-short-text">Logout</span>
+                    `;
                     headerDiv.appendChild(logoutButton);
                 } else {
                     // Reset the login form submit button when logged out
