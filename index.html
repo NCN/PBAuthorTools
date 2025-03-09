@@ -168,6 +168,18 @@
         h1.fw-bold {
             padding-bottom: 4px;
             border-bottom-width: 2px;
+            display: block; /* Make the element a block for full width */
+            width: 100%; /* Ensure it takes full width */
+        }
+    }
+
+    /* For extra small screens - ensure the title and underline are fully visible */
+    @media (max-width: 480px) {
+        h1.fw-bold {
+            font-size: 1.25rem;
+            margin-bottom: 0;
+            display: block;
+            width: 100%;
         }
     }
         
