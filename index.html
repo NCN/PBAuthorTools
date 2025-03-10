@@ -296,6 +296,15 @@
         }
     }
     </style>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6P7RCTZ8NX"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-6P7RCTZ8NX');
+    </script>
 </head>
 <body>
     <div class="container py-4">
@@ -872,6 +881,7 @@
             <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"><\/script>
             <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"><\/script>
             <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"><\/script>
+            <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics-compat.js"><\/script>
         `);
 
 
@@ -1073,6 +1083,9 @@
 
             // Initialize Firebase
             firebase.initializeApp(firebaseConfig);  
+
+            // Initialize Google Analytics with Firebase
+            firebase.analytics();
 
             // Set up the readability analysis feature
             document.getElementById('analyze-readability').addEventListener('click', function() {
@@ -2381,7 +2394,122 @@
         }
 
         
+        // Track all main features
+        // Word Cloud generation
+        document.getElementById('generate-word-cloud')?.addEventListener('click', function() {
+            trackFeatureUsage('word_cloud');
+        });
         
+        // Readability Analysis
+        document.getElementById('analyze-readability')?.addEventListener('click', function() {
+            trackFeatureUsage('readability_analysis');
+        });
+        
+        // Word Frequency
+        document.getElementById('generate-word-freq')?.addEventListener('click', function() {
+            trackFeatureUsage('word_frequency');
+        });
+        
+        // Adverb Detection
+        document.getElementById('detect-adverbs')?.addEventListener('click', function() {
+            trackFeatureUsage('adverb_detection');
+        });
+        
+        // Rhyme Word Detection
+        document.getElementById('detect-rhyme-words')?.addEventListener('click', function() {
+            const onlyLineEndings = document.getElementById('only-line-endings').checked;
+            trackFeatureUsage('rhyme_word_detection', {
+            'line_endings_only': onlyLineEndings
+            });
+        });
+        
+        // Art Note Deletion
+        document.getElementById('delete-art-notes')?.addEventListener('click', function() {
+            trackFeatureUsage('art_note_deletion');
+        });
+        
+        // Feature Suggestion
+        document.getElementById('submit-feature-btn')?.addEventListener('click', function() {
+            trackFeatureUsage('feature_suggestion');
+        });
+        
+        // Track authentication methods
+        document.getElementById('google-login-btn')?.addEventListener('click', function() {
+            if (typeof gtag === 'function') {
+            gtag('event', 'login_attempt', { 'method': 'google' });
+            }
+        });
+        
+        document.getElementById('login-form')?.addEventListener('submit', function(e) {
+            if (typeof gtag === 'function') {
+            gtag('event', 'login_attempt', { 'method': 'email' });
+            }
+        });
+        
+        document.getElementById('signup-form')?.addEventListener('submit', function(e) {
+            if (typeof gtag === 'function') {
+            gtag('event', 'signup_attempt', { 'method': 'email' });
+            }
+        });
+        
+        // Track successful authentication outcome
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+            if (typeof gtag === 'function') {
+                gtag('event', 'login_success', {
+                'user_id': user.uid, // GA automatically hashes this for privacy
+                'login_method': user.providerData[0]?.providerId || 'unknown'
+                });
+            }
+            }
+        });
+        
+        // Track external link clicks
+        document.querySelectorAll('a[target="_blank"]').forEach(link => {
+            link.addEventListener('click', function() {
+            const linkUrl = this.href;
+            const linkText = this.innerText || 'unnamed link';
+            
+            if (typeof gtag === 'function') {
+                gtag('event', 'external_link_click', {
+                'link_url': linkUrl,
+                'link_text': linkText
+                });
+            }
+            });
+        });
+
+        // Track manuscript editing metrics
+        const editor = document.querySelector('#editor')?.querySelector('.ql-editor');
+        if (editor) {
+            // Use a timer to track content changes without too many events
+            let editTimer = null;
+            const debouncedTracking = function() {
+            if (editTimer) {
+                clearTimeout(editTimer);
+            }
+            
+            editTimer = setTimeout(function() {
+                const textContent = editor.textContent || '';
+                if (textContent.length > 0) {
+                // Track document length and art note usage
+                const artNotes = findArtNotes(textContent); // Using your existing function
+                
+                if (typeof gtag === 'function') {
+                    gtag('event', 'manuscript_metrics', {
+                    'word_count': getWordsFromText(textContent).length, // Using your existing function
+                    'art_note_count': artNotes.length,
+                    'document_length_category': categorizeDocLength(textContent.length)
+                    });
+                }
+                }
+            }, 5000); // Track after 5 seconds of inactivity
+            };
+            
+            // Add mutation observer to track content changes
+            const observer = new MutationObserver(debouncedTracking);
+            observer.observe(editor, { childList: true, subtree: true, characterData: true });
+        }
 
         });
 
@@ -2435,6 +2563,21 @@
             });
         }
         
+        // Function to track feature usage with Google Analytics
+        function trackFeatureUsage(featureName, additionalParams = {}) {
+        // Check if gtag is available
+        if (typeof gtag === 'function') {
+            // Combine feature name with any additional parameters
+            const eventParams = {
+            'feature_name': featureName,
+            ...additionalParams
+            };
+            
+            // Send the event to Google Analytics
+            gtag('event', 'feature_used', eventParams);
+            console.log(`Tracked feature usage: ${featureName}`);
+        }
+        }
     </script>
 </body>
 </html>
