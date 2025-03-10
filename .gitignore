@@ -2,3 +2,4 @@
 /firebase-monitor/node_modules
 __pycache__/syllables.cpython-313.pyc
 firebase-monitor.zip
+.DS_Store
