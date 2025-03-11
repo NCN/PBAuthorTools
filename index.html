@@ -2143,6 +2143,7 @@
                 db.collection('users').doc(userCredential.user.uid).set({
                 email: email,
                 signup_date: firebase.firestore.FieldValue.serverTimestamp(),
+                auth_method: 'email'
                 });
             })
             .catch((error) => {
@@ -2170,6 +2171,7 @@
             signInWithProvider(provider);
         });
                
+        // For Google Authentication - add auth_method to Google sign-in
         function signInWithProvider(provider, newsletter = true) {
             auth.signInWithPopup(provider)
             .then((result) => {
@@ -2179,6 +2181,7 @@
                 db.collection('users').doc(result.user.uid).set({
                     email: result.user.email,
                     signup_date: firebase.firestore.FieldValue.serverTimestamp(),
+                    auth_method: 'google'
                 });
                 }
             })
