@@ -640,7 +640,7 @@
                                         in rhyming picture books when used as end rhymes.
                                     </p>
                                     <div class="form-check mb-3">
-                                        <input class="form-check-input" type="checkbox" id="only-line-endings" checked>
+                                        <input class="form-check-input" type="checkbox" id="only-line-endings">
                                         <label class="form-check-label" for="only-line-endings">
                                             Only detect at line or sentence endings 
                                             <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="When checked, only finds problematic rhyming words that appear at the end of lines or sentences - where they would typically be used as rhymes."></i>
@@ -2538,38 +2538,6 @@
             }
             });
         });
-
-        // Track manuscript editing metrics
-        const editor = document.querySelector('#editor')?.querySelector('.ql-editor');
-        if (editor) {
-            // Use a timer to track content changes without too many events
-            let editTimer = null;
-            const debouncedTracking = function() {
-            if (editTimer) {
-                clearTimeout(editTimer);
-            }
-            
-            editTimer = setTimeout(function() {
-                const textContent = editor.textContent || '';
-                if (textContent.length > 0) {
-                // Track document length and art note usage
-                const artNotes = findArtNotes(textContent); // Using your existing function
-                
-                if (typeof gtag === 'function') {
-                    gtag('event', 'manuscript_metrics', {
-                    'word_count': getWordsFromText(textContent).length, // Using your existing function
-                    'art_note_count': artNotes.length,
-                    'document_length_category': categorizeDocLength(textContent.length)
-                    });
-                }
-                }
-            }, 5000); // Track after 5 seconds of inactivity
-            };
-            
-            // Add mutation observer to track content changes
-            const observer = new MutationObserver(debouncedTracking);
-            observer.observe(editor, { childList: true, subtree: true, characterData: true });
-        }
 
         });
 
