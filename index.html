@@ -2213,8 +2213,8 @@
                 const password = document.getElementById('login-password').value;
 
                 // Clear previous error messages
-                //document.getElementById('auth-message').innerHTML = '';
                 document.getElementById('login-message').innerHTML = '';
+                document.getElementById('signup-message').innerHTML = '';
 
                 // Show loading state
                 const submitBtn = this.querySelector('button[type="submit"]');
@@ -2308,6 +2308,10 @@
 
             // Google Authentication
             document.getElementById('google-login-btn')?.addEventListener('click', function () {
+                // Clear any existing error messages
+                document.getElementById('login-message').innerHTML = '';
+                document.getElementById('signup-message').innerHTML = '';
+                
                 const provider = new firebase.auth.GoogleAuthProvider();
                 signInWithProvider(provider);
             });
