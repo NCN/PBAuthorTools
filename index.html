@@ -255,11 +255,9 @@
     }
 
     /* Make button more compact on very small screens */
-    @media (max-width: 480px) {
-        #suggest-feature-btn {
-            padding: 0.35rem 0.7rem;
-            font-size: 0.9rem;
-        }
+    #suggest-feature-btn {
+        padding: 0.35rem 0.7rem;
+        font-size: 0.9rem;
     }
 
     /* Logout button responsive styling */
@@ -334,6 +332,16 @@
         #sign-in-button {
             display: inline; /* Show on mobile */
         }
+    }
+
+    /* Make Sign In button text match other buttons */
+    #sign-in-button {
+        font-size: 0.9rem;  /* Match the size of the other buttons */
+    }
+
+    /* Make Logout button text match other buttons */
+    #logout-button {
+        font-size: 0.9rem;  /* Match the size of the other buttons */
     }
     </style>
 
@@ -2564,56 +2572,6 @@
         }
 
         });
-
-        /*function addLogoutButton() {
-            const headerDiv = document.querySelector('header > div');
-            
-            // Remove any previous authentication state listeners
-            if (window.authStateUnsubscribe) {
-                window.authStateUnsubscribe();
-            }
-
-            // Create a single logout button
-            let logoutButton = document.getElementById('logout-button');
-            if (!logoutButton) {
-                logoutButton = document.createElement('button');
-                logoutButton.id = 'logout-button';
-                logoutButton.className = 'btn btn-outline-secondary ms-2';
-                logoutButton.addEventListener('click', function() {
-                    firebase.auth().signOut().then(() => {
-                        document.getElementById('login-section').style.display = 'block';
-                        document.getElementById('editor-section').style.display = 'none';
-                    });
-                });
-            }
-
-            // Set up the authentication state listener
-            window.authStateUnsubscribe = firebase.auth().onAuthStateChanged(function(user) {
-                // Remove any existing logout buttons first
-                const existingButtons = headerDiv.querySelectorAll('#logout-button');
-                existingButtons.forEach(btn => headerDiv.removeChild(btn));
-
-                if (user) {
-                    // Update button text with spans for responsive layout
-                    const username = user.email.split('@')[0];
-                    logoutButton.innerHTML = `
-                        <i class="fas fa-sign-out-alt me-2"></i>
-                        <span class="username-text">${username}</span>
-                        <span class="logout-text"> (Logout)</span>
-                        <span class="logout-short-text">Logout</span>
-                    `;
-                    headerDiv.appendChild(logoutButton);
-                } else {
-                    // Reset the login form submit button when logged out
-                    const loginForm = document.getElementById('login-form');
-                    if (loginForm) {
-                        const submitBtn = loginForm.querySelector('button[type="submit"]');
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = 'Log In';
-                    }
-                }
-            });
-        }*/
 
         function addLogoutButton() {
             const headerDiv = document.querySelector('header > div');
