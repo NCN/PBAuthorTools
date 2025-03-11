@@ -2280,6 +2280,9 @@
                             signup_date: firebase.firestore.FieldValue.serverTimestamp(),
                             auth_method: 'email'
                         });
+
+                        // Reset the form immediately after successful account creation
+                        document.getElementById('signup-form').reset();
                     })
                     .catch((error) => {
                         // Handle errors
@@ -2753,6 +2756,19 @@
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = 'Log In';
                     }
+
+                    // Reset the signup form when logged out
+                    const signupForm = document.getElementById('signup-form');
+                    if (signupForm) {
+                        signupForm.reset();
+                        const submitBtn = signupForm.querySelector('button[type="submit"]');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = 'Create Account';
+                    }
+                    
+                    // Clear any signup messages
+                    const signupMessage = document.getElementById('signup-message');
+                    if (signupMessage) signupMessage.innerHTML = '';
                 }
             });
         }
