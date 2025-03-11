@@ -324,6 +324,17 @@
         font-size: 1rem;
         }
     }
+
+    /* Sign in button responsive styling */
+    #sign-in-button {
+        display: none; /* Hidden by default */
+    }
+
+    @media (max-width: 768px) {
+        #sign-in-button {
+            display: inline; /* Show on mobile */
+        }
+    }
     </style>
 
     <!-- Google Analytics -->
@@ -1113,6 +1124,9 @@
 
             // Initialize Google Analytics with Firebase
             firebase.analytics();
+
+            // Initialize auth buttons (sign in/sign out)
+            addLogoutButton();
 
             // Set up the readability analysis feature
             document.getElementById('analyze-readability').addEventListener('click', function() {
@@ -2539,7 +2553,7 @@
 
         });
 
-        function addLogoutButton() {
+        /*function addLogoutButton() {
             const headerDiv = document.querySelector('header > div');
             
             // Remove any previous authentication state listeners
@@ -2587,7 +2601,89 @@
                     }
                 }
             });
-        }
+        }*/
+
+        function addLogoutButton() {
+            const headerDiv = document.querySelector('header > div');
+            
+            // Remove any previous authentication state listeners
+            if (window.authStateUnsubscribe) {
+                window.authStateUnsubscribe();
+            }
+
+            // Create a single logout button
+            let logoutButton = document.getElementById('logout-button');
+            if (!logoutButton) {
+                logoutButton = document.createElement('button');
+                logoutButton.id = 'logout-button';
+                logoutButton.className = 'btn btn-outline-secondary ms-2';
+                logoutButton.addEventListener('click', function() {
+                    firebase.auth().signOut().then(() => {
+                        document.getElementById('login-section').style.display = 'block';
+                        document.getElementById('editor-section').style.display = 'none';
+                    });
+                });
+            }
+            
+            // Create sign in button (for mobile)
+            let signInButton = document.getElementById('sign-in-button');
+            if (!signInButton) {
+                signInButton = document.createElement('button');
+                signInButton.id = 'sign-in-button';
+                signInButton.className = 'btn btn-primary ms-2';
+                signInButton.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Sign in';
+                signInButton.addEventListener('click', function() {
+                    // Smooth scroll to Google login button to ensure it's visible
+                    const googleButton = document.getElementById('google-login-btn');
+                    if (googleButton) {
+                        googleButton.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    } else {
+                        // Fallback to scrolling to the auth panel with offset
+                        const authPanel = document.getElementById('auth-panel');
+                        if (authPanel) {
+                            const y = authPanel.getBoundingClientRect().top + window.pageYOffset - 100; // 100px offset
+                            window.scrollTo({top: y, behavior: 'smooth'});
+                        } else {
+                            // Last resort fallback
+                            document.getElementById('login-section').scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                });
+            }
+
+            // Set up the authentication state listener
+            window.authStateUnsubscribe = firebase.auth().onAuthStateChanged(function(user) {
+                // Remove any existing auth buttons first
+                const existingLogoutButtons = headerDiv.querySelectorAll('#logout-button');
+                existingLogoutButtons.forEach(btn => btn.parentNode && headerDiv.removeChild(btn));
+                
+                const existingSignInButtons = headerDiv.querySelectorAll('#sign-in-button');
+                existingSignInButtons.forEach(btn => btn.parentNode && headerDiv.removeChild(btn));
+
+                if (user) {
+                    // User is logged in, show logout button
+                    const username = user.email.split('@')[0];
+                    logoutButton.innerHTML = `
+                        <i class="fas fa-sign-out-alt me-2"></i>
+                        <span class="username-text">${username}</span>
+                        <span class="logout-text"> (Logout)</span>
+                        <span class="logout-short-text">Logout</span>
+                    `;
+                    headerDiv.appendChild(logoutButton);
+                } else {
+                    // User is logged out, show sign in button (on mobile)
+                    headerDiv.appendChild(signInButton);
+                    
+                    // Reset the login form submit button when logged out
+                    const loginForm = document.getElementById('login-form');
+                    if (loginForm) {
+                        const submitBtn = loginForm.querySelector('button[type="submit"]');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = 'Log In';
+                    }
+                }
+            });
+        }    
         
         // Function to track feature usage with Google Analytics
         function trackFeatureUsage(featureName, additionalParams = {}) {
