@@ -1358,6 +1358,12 @@
                 
                 // Add logout button
                 addLogoutButton();
+                
+                // Smoothly scroll to the top of the page
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
             }
 
             // Check if user is already logged in
@@ -1366,6 +1372,13 @@
                     // User is signed in
                     console.log("User signed in:", user.email);
                     showEditorSection(user.email);
+
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'login_success', {
+                        'user_id': user.uid, // GA automatically hashes this for privacy
+                        'login_method': user.providerData[0]?.providerId || 'unknown'
+                        });
+                    }
                     
                     // Check or create user document in Firestore
                     const userRef = firebase.firestore().collection('users').doc(user.uid);
@@ -1374,9 +1387,7 @@
                         // Create new user document
                         userRef.set({
                         email: user.email,
-                        //newsletter_subscribed: true,
                         signup_date: firebase.firestore.FieldValue.serverTimestamp(),
-                        //added_to_substack: false
                         });
                     }
                     });
@@ -2131,9 +2142,7 @@
                 // Store user in database with newsletter preference
                 db.collection('users').doc(userCredential.user.uid).set({
                 email: email,
-                //newsletter_subscribed: newsletter,
                 signup_date: firebase.firestore.FieldValue.serverTimestamp(),
-                //added_to_substack: false
                 });
             })
             .catch((error) => {
@@ -2169,9 +2178,7 @@
                 // Store user in database with newsletter preference
                 db.collection('users').doc(result.user.uid).set({
                     email: result.user.email,
-                    newsletter_subscribed: newsletter,
                     signup_date: firebase.firestore.FieldValue.serverTimestamp(),
-                    added_to_substack: false
                 });
                 }
             })
@@ -2479,17 +2486,6 @@
             }
         });
         
-        // Track successful authentication outcome
-        firebase.auth().onAuthStateChanged(function(user) {
-            if (user) {
-            if (typeof gtag === 'function') {
-                gtag('event', 'login_success', {
-                'user_id': user.uid, // GA automatically hashes this for privacy
-                'login_method': user.providerData[0]?.providerId || 'unknown'
-                });
-            }
-            }
-        });
         
         // Track external link clicks
         document.querySelectorAll('a[target="_blank"]').forEach(link => {
