@@ -1119,13 +1119,13 @@
             }
 
             // Utility function to remove art notes and clean text
-            static removeArtNotes(text) {
+            /*static removeArtNotes(text) {
                 // Remove text within square brackets or parentheses that might be art notes
                 return text.replace(/\[.*?\]|\(.*?\)/g, '');
-            }
+            }*/
 
             // Utility function to get words from text
-            static getWordsFromText(text) {
+            /*static getWordsFromText(text) {
                 // Clean the text and split into words
                 return text.toLowerCase()
                     .replace(/["".,\/#—!$%\^&\*;:{}=\_`''~()?"…\[\]]/g, ' ')
@@ -1133,16 +1133,18 @@
                     .replace(/\s{2,}/g, ' ')
                     .trim()
                     .split(/\s+/);
-            }
+            }*/
 
             // Analyze Readability
             static analyze(text) {
                 // Remove art notes and clean text
-                const cleanText = this.removeArtNotes(text);
+                //const cleanText = this.removeArtNotes(text);
+                const cleanText = removeArtNotes(text);
 
                 // Split into sentences and words
                 const sentences = cleanText.split(/[.!?]+/).filter(s => s.trim().length > 0);
-                const words = this.getWordsFromText(cleanText);
+                //const words = this.getWordsFromText(cleanText);
+                const words = getWordsFromText(cleanText);
 
                 // Basic metrics
                 const totalSentences = sentences.length;
@@ -1661,27 +1663,6 @@
                 return quill.getText().trim();
             }
 
-            function getWordsFromText(text) {
-                if (!text || text.trim() === '') {
-                    return [];
-                }
-
-                // Clean the text and split into words
-                /*return text.toLowerCase()
-                    .replace(/[.,\/#—!$%\^&\*;:{}=\_\-`''~()"?""…\[\]]/g, ' ')
-                    .replace(/\s{2,}/g, ' ')
-                    .trim()
-                    .split(/\s+/);*/
-
-                return text.toLowerCase()
-                    .replace(/[“”.,\/#—!$%\^&\*;:{}=\_`''~()?"…\[\]]/g, ' ')
-                    .replace(/(^|\s)-|-(\s|$)/g, ' ')
-                    .replace(/\s{2,}/g, ' ')
-                    .trim()
-                    .split(/\s+/);
-
-            }
-
             function getWordFrequencies(text) {
                 const words = getWordsFromText(text);
                 if (words.length === 0) {
@@ -1711,136 +1692,6 @@
                     .slice(0, 100); // Limit to top 100 words
 
                 return sortedFreq;
-            }
-
-            function removeArtNotes(text) {
-                // Get art notes using the new function
-                const artNotes = findArtNotes(text);
-
-                // Sort art notes in reverse order (to avoid index shifting when removing)
-                artNotes.sort((a, b) => b.start - a.start);
-
-                // Create a copy of the text
-                let cleanText = text;
-
-                // Remove each art note from the text
-                artNotes.forEach(note => {
-                    cleanText = cleanText.substring(0, note.start) + ' ' + cleanText.substring(note.end + 1);
-                });
-
-                return cleanText;
-            }
-
-            // Comprehensive art note detection function that handles nested parentheses
-            function findArtNotes(text) {
-                const artNotes = [];
-                let bracketDepth = 0;
-                let parenDepth = 0;
-                let currentBracketNote = "";
-                let currentParenNote = "";
-                let bracketStartIndex = -1;
-                let parenStartIndex = -1;
-                let inBracketArtNote = false;
-                let inParenArtNote = false;
-
-                // For parenthetical art notes, we need keywords
-                //const artNoteKeywords = ["art note", "illo", "illus", "illustration note", "action note"];
-                const artNoteKeywords = ["art note", "art:", "illo", "illus", "illustration note", "action note"];
-
-                for (let i = 0; i < text.length; i++) {
-                    const char = text[i];
-
-                    // Handle square bracket art notes
-                    if (char === '[' && !inParenArtNote) {
-                        if (bracketDepth === 0) {
-                            // Start of a potential art note
-                            bracketStartIndex = i;
-                            currentBracketNote = "[";
-                            inBracketArtNote = true;
-                        } else {
-                            // Nested brackets inside art note
-                            currentBracketNote += char;
-                        }
-                        bracketDepth++;
-                    }
-                    else if (char === ']' && inBracketArtNote) {
-                        bracketDepth--;
-                        currentBracketNote += char;
-
-                        if (bracketDepth === 0) {
-                            // End of art note
-                            artNotes.push({
-                                text: currentBracketNote,
-                                start: bracketStartIndex,
-                                end: i
-                            });
-                            currentBracketNote = "";
-                            inBracketArtNote = false;
-                        }
-                    }
-                    // Handle parenthetical art notes
-                    else if (char === '(' && !inBracketArtNote) {
-                        if (parenDepth === 0) {
-                            // This might be the start of a parenthetical art note
-                            parenStartIndex = i;
-                            currentParenNote = "(";
-                            inParenArtNote = true;
-                        } else if (inParenArtNote) {
-                            // Nested parentheses
-                            currentParenNote += char;
-                        }
-                        parenDepth++;
-                    }
-                    else if (char === ')' && inParenArtNote) {
-                        parenDepth--;
-                        currentParenNote += char;
-
-                        if (parenDepth === 0) {
-                            // Check if this parenthetical note contains any art note keywords
-                            const noteText = currentParenNote.toLowerCase();
-                            const isArtNote = artNoteKeywords.some(keyword => noteText.includes(keyword));
-
-                            if (isArtNote) {
-                                artNotes.push({
-                                    text: currentParenNote,
-                                    start: parenStartIndex,
-                                    end: i
-                                });
-                            }
-
-                            currentParenNote = "";
-                            inParenArtNote = false;
-                        }
-                    }
-                    else {
-                        // Add character to the current art note if we're inside one
-                        if (inBracketArtNote) {
-                            currentBracketNote += char;
-                        }
-                        if (inParenArtNote) {
-                            currentParenNote += char;
-                        }
-                    }
-                }
-
-                // Handle unclosed art notes (important for real-time editing)
-                // For brackets - if we have an unclosed bracket art note, don't treat it as an art note
-                // For parentheses - only consider it if it has keywords
-                if (inParenArtNote && parenStartIndex >= 0) {
-                    // Check if this unclosed parenthetical contains keywords
-                    const noteText = currentParenNote.toLowerCase();
-                    const isArtNote = artNoteKeywords.some(keyword => noteText.includes(keyword));
-
-                    if (isArtNote) {
-                        artNotes.push({
-                            text: currentParenNote,
-                            start: parenStartIndex,
-                            end: text.length - 1
-                        });
-                    }
-                }
-
-                return artNotes;
             }
 
             function detectSpecialWords(text, wordList) {
@@ -2792,6 +2643,150 @@
                 console.log(`Tracked feature usage: ${featureName}`);
             }
         }
+
+        function removeArtNotes(text) {
+                // Get art notes using the new function
+                const artNotes = findArtNotes(text);
+
+                // Sort art notes in reverse order (to avoid index shifting when removing)
+                artNotes.sort((a, b) => b.start - a.start);
+
+                // Create a copy of the text
+                let cleanText = text;
+
+                // Remove each art note from the text
+                artNotes.forEach(note => {
+                    cleanText = cleanText.substring(0, note.start) + ' ' + cleanText.substring(note.end + 1);
+                });
+
+                return cleanText;
+        }
+
+        // Comprehensive art note detection function that handles nested parentheses
+        function findArtNotes(text) {
+            const artNotes = [];
+            let bracketDepth = 0;
+            let parenDepth = 0;
+            let currentBracketNote = "";
+            let currentParenNote = "";
+            let bracketStartIndex = -1;
+            let parenStartIndex = -1;
+            let inBracketArtNote = false;
+            let inParenArtNote = false;
+
+            // For parenthetical art notes, we need keywords
+            //const artNoteKeywords = ["art note", "illo", "illus", "illustration note", "action note"];
+            const artNoteKeywords = ["art note", "art:", "illo", "illus", "illustration note", "action note"];
+
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+
+                // Handle square bracket art notes
+                if (char === '[' && !inParenArtNote) {
+                    if (bracketDepth === 0) {
+                        // Start of a potential art note
+                        bracketStartIndex = i;
+                        currentBracketNote = "[";
+                        inBracketArtNote = true;
+                    } else {
+                        // Nested brackets inside art note
+                        currentBracketNote += char;
+                    }
+                    bracketDepth++;
+                }
+                else if (char === ']' && inBracketArtNote) {
+                    bracketDepth--;
+                    currentBracketNote += char;
+
+                    if (bracketDepth === 0) {
+                        // End of art note
+                        artNotes.push({
+                            text: currentBracketNote,
+                            start: bracketStartIndex,
+                            end: i
+                        });
+                        currentBracketNote = "";
+                        inBracketArtNote = false;
+                    }
+                }
+                // Handle parenthetical art notes
+                else if (char === '(' && !inBracketArtNote) {
+                    if (parenDepth === 0) {
+                        // This might be the start of a parenthetical art note
+                        parenStartIndex = i;
+                        currentParenNote = "(";
+                        inParenArtNote = true;
+                    } else if (inParenArtNote) {
+                        // Nested parentheses
+                        currentParenNote += char;
+                    }
+                    parenDepth++;
+                }
+                else if (char === ')' && inParenArtNote) {
+                    parenDepth--;
+                    currentParenNote += char;
+
+                    if (parenDepth === 0) {
+                        // Check if this parenthetical note contains any art note keywords
+                        const noteText = currentParenNote.toLowerCase();
+                        const isArtNote = artNoteKeywords.some(keyword => noteText.includes(keyword));
+
+                        if (isArtNote) {
+                            artNotes.push({
+                                text: currentParenNote,
+                                start: parenStartIndex,
+                                end: i
+                            });
+                        }
+
+                        currentParenNote = "";
+                        inParenArtNote = false;
+                    }
+                }
+                else {
+                    // Add character to the current art note if we're inside one
+                    if (inBracketArtNote) {
+                        currentBracketNote += char;
+                    }
+                    if (inParenArtNote) {
+                        currentParenNote += char;
+                    }
+                }
+            }
+
+            // Handle unclosed art notes (important for real-time editing)
+            // For brackets - if we have an unclosed bracket art note, don't treat it as an art note
+            // For parentheses - only consider it if it has keywords
+            if (inParenArtNote && parenStartIndex >= 0) {
+                // Check if this unclosed parenthetical contains keywords
+                const noteText = currentParenNote.toLowerCase();
+                const isArtNote = artNoteKeywords.some(keyword => noteText.includes(keyword));
+
+                if (isArtNote) {
+                    artNotes.push({
+                        text: currentParenNote,
+                        start: parenStartIndex,
+                        end: text.length - 1
+                    });
+                }
+            }
+
+            return artNotes;
+        }
+
+        function getWordsFromText(text) {
+            if (!text || text.trim() === '') {
+                return [];
+            }
+
+            return text.toLowerCase()
+                .replace(/[“”.,\/#—!$%\^&\*;:{}=\_`''~()?"…\[\]]/g, ' ')
+                .replace(/(^|\s)-|-(\s|$)/g, ' ')
+                .replace(/\s{2,}/g, ' ')
+                .trim()
+                .split(/\s+/);
+        }
+
     </script>
 </body>
 
