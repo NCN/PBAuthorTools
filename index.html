@@ -1225,6 +1225,9 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
+            // Variables for tracking mouse donw/up text selection
+            let isSelectingText = false;
+            let selectionTimeout = null;
 
             const firebaseConfig = {
                 apiKey: "AIzaSyDjl1-5F3IJ38TZZCK4IiW7PiapdEkTmI4",
@@ -1323,6 +1326,10 @@
                 },
                 placeholder: 'Paste your manuscript here...'
             });
+
+            // Setup function to detect when text selection is happening to prevent the art formatting
+            // from interrupting the user's selection
+            setupSelectionDetection(quill);
 
             // Feature suggestion modal handling
             document.getElementById('suggest-feature-btn')?.addEventListener('click', function () {
@@ -1648,10 +1655,12 @@
 
             // Process content changes with debouncing for better performance
             const processContentChanges = debounce(function () {
-                // Simply update word counts and highlight art notes
-                updateWordCounts();
-                highlightArtNotes(); // Explicitly call highlighting to ensure it updates
-            }, 100);
+                // Only update formatting if user is not currently selecting text
+                if (!isSelectingText) {
+                    updateWordCounts();
+                    highlightArtNotes();
+                } 
+            }, 450);
 
             // Monitor quill content changes
             quill.on('text-change', processContentChanges);
@@ -2542,6 +2551,35 @@
                 }
             }
             });
+
+            // This function to detect when text selection is happening to prevent the art formatting
+            // from interrupting the user's selection
+            function setupSelectionDetection(editor) {
+                // Track when user starts selecting text
+                editor.root.addEventListener('mousedown', function(e) {
+                    isSelectingText = true;
+                    
+                    // Clear any existing timeout
+                    if (selectionTimeout) {
+                    clearTimeout(selectionTimeout);
+                    }
+                });
+                
+                // Track when user finishes selecting text
+                document.addEventListener('mouseup', function(e) {
+                    // Set a small delay before allowing highlights again
+                    // This prevents immediate re-highlighting that could disrupt the selection
+                    if (selectionTimeout) {
+                    clearTimeout(selectionTimeout);
+                    }
+                    
+                    selectionTimeout = setTimeout(function() {
+                    isSelectingText = false;
+                    // Reapply formatting after selection is complete
+                    highlightArtNotes();
+                    }, 200); // 200ms delay before re-enabling formatting
+                });
+            }
         });
 
         function addLogoutButton() {
