@@ -175,8 +175,8 @@
         }
 
         .school-level {
-            background-color: #e8f4ff;
-            border-left: 4px solid #007bff;
+            background-color: #f8f9fa; /* Match other cards */
+            border-left: none; /* Remove the blue accent line */
         }
 
         /* Playful and Creative Style (No Emoji) */
@@ -454,7 +454,7 @@
                             <!--<h4 class="card-title">Access Picture Book Author Tools</h4>-->
                             <div class="alert alert-info mb-3">
                                 <i class="fas fa-check-circle me-2 text-success"></i>
-                                By signing into this free tool, you agree to be subscribed to <a
+                                By creating a free account on Picture Book Author Tools, you'll also be subscribed to <a
                                     href="https://hellonathan.substack.com/" target="_blank" class="alert-link">Nathan
                                     Christopher's free Substack newsletter</a>
                             </div>
@@ -602,58 +602,64 @@
                                         Readability</button>
                                     <div class="readability-results" style="display: none;" id="readability-results">
                                         <div class="row">
+                                            <!-- Word Count -->
                                             <div class="col-md-6 mb-2">
-                                                <div class="metric-card">
+                                                <div class="metric-card" data-bs-toggle="tooltip" title="Total number of words in the text, excluding art notes">
                                                     <div class="metric-value" id="word-count">0</div>
                                                     <div class="metric-label">Word Count</div>
                                                 </div>
                                             </div>
+
+                                            <!-- Sentence Count -->
                                             <div class="col-md-6 mb-2">
-                                                <div class="metric-card">
+                                                <div class="metric-card" data-bs-toggle="tooltip" title="Total number of sentences in the text">
                                                     <div class="metric-value" id="sentence-count">0</div>
                                                     <div class="metric-label">Sentence Count</div>
                                                 </div>
                                             </div>
+
+                                            <!-- Avg Words Per Sentence -->
                                             <div class="col-md-6 mb-2">
-                                                <div class="metric-card">
+                                                <div class="metric-card" data-bs-toggle="tooltip" title="Average number of words in each sentence">
                                                     <div class="metric-value" id="avg-words-per-sentence">0</div>
                                                     <div class="metric-label">Avg Words Per Sentence</div>
                                                 </div>
                                             </div>
+
+                                            <!-- Avg Syllables Per Word -->
                                             <div class="col-md-6 mb-2">
-                                                <div class="metric-card">
+                                                <div class="metric-card" data-bs-toggle="tooltip" title="Average number of syllables in each word">
                                                     <div class="metric-value" id="avg-syllables-per-word">0</div>
                                                     <div class="metric-label">Avg Syllables Per Word</div>
                                                 </div>
                                             </div>
+
+                                            <!-- Complex Word Percentage -->
                                             <div class="col-md-6 mb-2">
-                                                <div class="metric-card">
-                                                    <div class="metric-value" id="flesch-kincaid-grade">0</div>
-                                                    <div class="metric-label">Grade Level</div>
+                                                <div class="metric-card" data-bs-toggle="tooltip" title="Percentage of words with 3 or more syllables">
+                                                    <div class="metric-value" id="complex-word-percentage">0%</div>
+                                                    <div class="metric-label">Complex Words (3+ syllables)</div>
                                                 </div>
                                             </div>
+
+                                            <!-- Grade Level -->
                                             <div class="col-md-6 mb-2">
-                                                <div class="metric-card">
+                                                <div class="metric-card" data-bs-toggle="tooltip" title="Flesch-Kincaid Grade Level - numerical score representing the U.S. grade level needed to understand the text">
+                                                    <div class="metric-value" id="flesch-kincaid-grade">0</div>
+                                                    <div class="metric-label">Grade Level Score</div>
+                                                </div>
+                                            </div>
+                                            <!-- Reading Ease Score -->
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card" data-bs-toggle="tooltip" title="Flesch Reading Ease - higher score means easier to read (100=very easy, 0=very difficult)">
                                                     <div class="metric-value" id="flesch-reading-ease">0</div>
                                                     <div class="metric-label">Reading Ease Score</div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-2">
-                                                <div class="metric-card">
-                                                    <div class="metric-value" id="complex-word-percentage">0%</div>
-                                                    <div class="metric-label">Complex Words (3+ syllables)</div>
-                                                </div>
-                                            </div>
-                                            <!--<div class="col-md-6 mb-2">
-                                                <div class="metric-card reading-ease">
-                                                    <div class="metric-value" id="reading-ease-category">-</div>
-                                                    <div class="metric-label">Reading Ease Category</div>
-                                                </div>
-                                            </div>-->
-                                            <div class="col-md-6 mb-2">
-                                                <div class="metric-card school-level">
+                                                <div class="metric-card" data-bs-toggle="tooltip" title="Grade level based on Flesch Reading Ease score — ranges from Professional (0-10) to 5th grade (90+)">
                                                     <div class="metric-value" id="school-level">-</div>
-                                                    <div class="metric-label">School Level</div>
+                                                    <div class="metric-label">Reading Ease School Level</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -1284,6 +1290,11 @@
                 } else {
                     easeElement.style.color = '#dc3545'; // Red - difficult
                 }
+
+                // Initialize tooltips after updating readability results
+                document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+                    new bootstrap.Tooltip(el);
+                });
             });
 
             // Initialize Quill editor
