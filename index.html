@@ -1311,6 +1311,7 @@
                         [{ 'align': [] }],
                         ['clean']
                     ],
+                    clipboard: {},  
                     keyboard: {
                         bindings: {
                             'enter': {
@@ -1326,6 +1327,9 @@
                 },
                 placeholder: 'Paste your manuscript here...'
             });
+
+            // Set up the custom paste handler
+            setupCustomQuillPasteHandler(quill);
 
             // Setup function to detect when text selection is happening to prevent the art formatting
             // from interrupting the user's selection
@@ -2836,6 +2840,89 @@
                 .split(/\s+/);
         }
 
+        function setupCustomQuillPasteHandler(quill) {
+            // Get the editing area element (Quill's contenteditable div)
+            const editorElement = quill.root;
+            
+            // Add event listener for paste event directly on the editor element
+            editorElement.addEventListener('paste', function(e) {
+                // We need to let the paste happen, then clean it after
+                setTimeout(() => {
+                    // Get the HTML content after paste
+                    const html = quill.root.innerHTML;
+                    console.log('HTML after paste:', html);
+
+                    // Clean the HTML
+                    const cleanedHtml = cleanDocumentComments(html);
+                    console.log('HTML after cleaning:', cleanedHtml);
+
+                    // If the HTML changed (comments were removed), update the editor
+                    if (cleanedHtml !== html) {
+                        
+                        // Save current selection
+                        const range = quill.getSelection();
+                        
+                        // Set new content
+                        quill.root.innerHTML = cleanedHtml;
+                        
+                        // Restore selection if it existed
+                        if (range) {
+                        quill.setSelection(range);
+                        }
+                    }
+                }, 0);
+            });
+        }
+
+        // Add the cleanDocumentComments function
+        function cleanDocumentComments(html) {
+            if (!html || typeof html !== 'string') return html;
+            
+            // Microsoft Word comment patterns
+            // Remove comment reference links with their markers
+            html = html.replace(/<a\s+href="#_msocom_\d+"[^>]*>\[\w+\d*\]<\/a>/gi, '');
+            
+            // Remove entire paragraphs containing comment anchors and their text
+            html = html.replace(/<p[^>]*>\s*&nbsp;\s*<a\s+href="#_msoanchor_\d+"[^>]*>\[\w+\d*\]<\/a>.*?<\/p>/gi, '');
+            
+            // If the above doesn't catch all instances, target the anchor and following text directly
+            const anchorRegex = /<a\s+href="#_msoanchor_\d+"[^>]*>\[\w+\d*\]<\/a>(.*?)(?=<\/p>|<p>|$)/gi;
+            html = html.replace(anchorRegex, '');
+            
+            // Remove comment reference spans
+            html = html.replace(/<span\s+(?:[^>]*\s+)?class="(?:[^"]*\s+)?(?:MsoCommentReference|CommentReference)(?:\s+[^"]*)?[^>]*>[\s\S]*?<\/span>/gi, '');
+            
+            // Remove comment text and content
+            html = html.replace(/<div\s+(?:[^>]*\s+)?class="(?:[^"]*\s+)?(?:MsoCommentText|CommentText)(?:\s+[^"]*)?[^>]*>[\s\S]*?<\/div>/gi, '');
+            
+            // Remove Word comment markers like [NC1], [EC1], [NN2], etc.
+            html = html.replace(/\[(?:\w+\d*)\]/g, '');
+            
+            // Google Docs comment patterns
+            // Remove Google comment elements
+            html = html.replace(/<span\s+(?:[^>]*\s+)?(?:id="cmnt\d+"[^>]*|class="[^"]*\bgoogle-docs-comment\b[^"]*")[\s\S]*?<\/span>/gi, '');
+            
+            // Remove Google suggestion spans (another format they sometimes use)
+            html = html.replace(/<span\s+[^>]*data-suggestion-thread-id[^>]*>[\s\S]*?<\/span>/gi, '');
+            
+            // Remove any hidden comment sections
+            html = html.replace(/<div\s+[^>]*(?:comment-section|docs-comment)[^>]*>[\s\S]*?<\/div>/gi, '');
+            
+            // Fix the specific case of extra whitespace between "Art Notes" and the colon
+            html = html.replace(/Art Notes<\/span><span[^>]*>&nbsp;<\/span>\s*&nbsp;\s*<span[^>]*>:/gi, 
+                                'Art Notes</span><span style="color: rgb(79, 129, 189);">:</span><span style="color: rgb(79, 129, 189);">');
+            
+            // Clean up multiple consecutive spaces (often left after comment removal)
+            html = html.replace(/(&nbsp;|\s){2,}/gi, ' ');
+            
+            // Clean up empty paragraphs
+            html = html.replace(/<p[^>]*>\s*(?:&nbsp;)?\s*<\/p>/gi, '');
+            
+            return html;
+        }
+
+
+        
     </script>
 </body>
 
