@@ -1201,7 +1201,24 @@
                 const cleanText = removeArtNotes(text);
 
                 // Split into sentences and words
-                const sentences = cleanText.split(/[.!?]+/).filter(s => s.trim().length > 0);
+                const sentences = improvedSentenceSplit(cleanText);
+
+                // Add this right after the line that defines 'sentences' in the analyze-readability click handler
+                /*console.log("Total sentences detected:", sentences.length);
+                sentences.forEach((sentence, index) => {
+                    // Trim the sentence and limit its display length to avoid console clutter
+                    const displaySentence = sentence.trim();
+                    const truncatedSentence = displaySentence.length > 100 
+                        ? displaySentence.substring(0, 100) + "..." 
+                        : displaySentence;
+                    
+                    console.log(`Sentence #${index + 1}: "${truncatedSentence}"`);
+                    
+                    // Optional: you can also log the word count for each sentence
+                    //const sentenceWords = sentence.trim().split(/\s+/).filter(word => word.length > 0);
+                    //console.log(`  Words: ${sentenceWords.length}`);
+                });*/
+
                 //const words = this.getWordsFromText(cleanText);
                 const words = getWordsFromText(cleanText);
 
@@ -3013,6 +3030,76 @@
             return cleanedHtml;
             }
         
+            function improvedSentenceSplit(text) {
+                // First, normalize line breaks
+                const normalizedText = text.replace(/\r\n/g, '\n');
+                
+                // Split by obvious sentence boundaries (periods, exclamation marks, question marks)
+                // followed by whitespace or end of string
+                let chunks = normalizedText.split(/[.!?](?:\s+|$)/);
+                
+                let sentences = [];
+                
+                chunks.forEach(chunk => {
+                    if (!chunk.trim()) return;
+                    
+                    // Check for paragraph breaks within the chunk (could indicate separate thoughts)
+                    const paragraphs = chunk.split(/\n\s*\n/);
+                    
+                    if (paragraphs.length > 1) {
+                    // Multiple paragraphs should be treated as separate sentences
+                    paragraphs.forEach(para => {
+                        if (para.trim()) sentences.push(para.trim());
+                    });
+                    } else {
+                    // Single paragraph - check for line breaks that might be sentence boundaries
+                    // This handles cases where a line break is used instead of punctuation
+                    // but avoids breaking up a sentence that just happens to span multiple lines
+                    const lines = chunk.split('\n');
+                    
+                    let currentSentence = '';
+                    
+                    lines.forEach((line, index) => {
+                        const trimmedLine = line.trim();
+                        if (!trimmedLine) {
+                        // Empty line - add current sentence if any and reset
+                        if (currentSentence) {
+                            sentences.push(currentSentence);
+                            currentSentence = '';
+                        }
+                        return;
+                        }
+                        
+                        // Check if this line starts with a capital letter and previous line ends with complete thought
+                        const startsWithCapital = /^[A-Z]/.test(trimmedLine);
+                        const previousLineEndsComplete = index > 0 && /(?:,|;|:)$/.test(lines[index-1].trim());
+                        
+                        if (startsWithCapital && (currentSentence === '' || previousLineEndsComplete)) {
+                        // This appears to be a new sentence
+                        if (currentSentence) {
+                            sentences.push(currentSentence);
+                            currentSentence = trimmedLine;
+                        } else {
+                            currentSentence = trimmedLine;
+                        }
+                        } else {
+                        // Continuation of current sentence
+                        currentSentence = currentSentence 
+                            ? `${currentSentence} ${trimmedLine}` 
+                            : trimmedLine;
+                        }
+                    });
+                    
+                    // Add the last sentence if any
+                    if (currentSentence) {
+                        sentences.push(currentSentence);
+                    }
+                    }
+                });
+                
+                return sentences.filter(s => s.length > 0);
+            }
+
     </script>
 </body>
 
