@@ -598,6 +598,10 @@
                             <div id="readabilityCollapse" class="accordion-collapse collapse"
                                 data-bs-parent="#featuresAccordion">
                                 <div class="accordion-body">
+                                    <p class="text-muted small mb-3">
+                                        Measures text complexity with Flesch–Kincaid metrics. Higher "Reading-Ease" scores indicate easier readability, while "Grade Level" shows U.S. grade equivalent. Helps ensure your writing matches your intended audience.
+                                        <a href="https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests" target="_blank">Read more on Wikipedia</a>
+                                    </p>                                    
                                     <button id="analyze-readability" class="btn btn-sm btn-primary mb-3">Analyze
                                         Readability</button>
                                     <div class="readability-results" style="display: none;" id="readability-results">
@@ -634,14 +638,6 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Complex Word Percentage -->
-                                            <div class="col-md-6 mb-2">
-                                                <div class="metric-card" data-bs-toggle="tooltip" title="Percentage of words with 3 or more syllables">
-                                                    <div class="metric-value" id="complex-word-percentage">0%</div>
-                                                    <div class="metric-label">Complex Words (3+ syllables)</div>
-                                                </div>
-                                            </div>
-
                                             <!-- Grade Level -->
                                             <div class="col-md-6 mb-2">
                                                 <div class="metric-card" data-bs-toggle="tooltip" title="Flesch-Kincaid Grade Level - numerical score representing the U.S. grade level needed to understand the text">
@@ -653,13 +649,21 @@
                                             <div class="col-md-6 mb-2">
                                                 <div class="metric-card" data-bs-toggle="tooltip" title="Flesch Reading Ease - higher score means easier to read (100=very easy, 0=very difficult)">
                                                     <div class="metric-value" id="flesch-reading-ease">0</div>
-                                                    <div class="metric-label">Reading Ease Score</div>
+                                                    <div class="metric-label">Reading-Ease Score</div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-2">
                                                 <div class="metric-card" data-bs-toggle="tooltip" title="Grade level based on Flesch Reading Ease score — ranges from Professional (0-10) to 5th grade (90+)">
                                                     <div class="metric-value" id="school-level">-</div>
-                                                    <div class="metric-label">Reading Ease School Level</div>
+                                                    <div class="metric-label">Reading-Ease School Level</div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Complex Word Percentage -->
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card" data-bs-toggle="tooltip" title="Percentage of words with 3 or more syllables">
+                                                    <div class="metric-value" id="complex-word-percentage">0%</div>
+                                                    <div class="metric-label">Complex Words (3+ syllables)</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -677,8 +681,10 @@
                             <div id="wordCloudCollapse" class="accordion-collapse collapse"
                                 data-bs-parent="#featuresAccordion">
                                 <div class="accordion-body">
-                                    <button id="generate-word-cloud" class="btn btn-sm btn-primary mb-2">Generate Word
-                                        Cloud</button>
+                                    <p class="text-muted small mb-3">
+                                        Visualizes word frequency with larger text for commonly used words. Helps identify repetition patterns and improve vocabulary variety. Click any word to highlight all instances in your manuscript.
+                                    </p>                                    
+                                    <button id="generate-word-cloud" class="btn btn-sm btn-primary mb-2">Generate Word Cloud</button>
                                     <div id="word-cloud-container" class="word-cloud-container"></div>
                                 </div>
                             </div>
@@ -693,8 +699,10 @@
                             <div id="wordFrequencyCollapse" class="accordion-collapse collapse"
                                 data-bs-parent="#featuresAccordion">
                                 <div class="accordion-body">
-                                    <button id="generate-word-freq" class="btn btn-sm btn-primary mb-2">Generate
-                                        Frequency List</button>
+                                    <p class="text-muted small mb-3">
+                                        Lists words by frequency to help identify repetition and expand vocabulary choices. More varied language creates engaging text for readers. Click any word to highlight all occurrences.
+                                    </p>                                    
+                                    <button id="generate-word-freq" class="btn btn-sm btn-primary mb-2">Generate Frequency List</button>
                                     <div id="word-freq-list" class="list-group">
                                         <!-- Word frequency items will be populated here -->
                                     </div>
@@ -711,6 +719,9 @@
                             <div id="adverbsCollapse" class="accordion-collapse collapse"
                                 data-bs-parent="#featuresAccordion">
                                 <div class="accordion-body">
+                                    <p class="text-muted small mb-3">
+                                        Identifies adverbs (often ending in "-ly") that may weaken your writing. Replace with stronger verbs for more vivid descriptions. Click any adverb to highlight all instances in your manuscript.
+                                    </p>                                    
                                     <button id="detect-adverbs" class="btn btn-sm btn-primary mb-2">Detect
                                         Adverbs</button>
                                     <div id="adverbs-list" class="list-group">
@@ -730,15 +741,13 @@
                                 data-bs-parent="#featuresAccordion">
                                 <div class="accordion-body">
                                     <p class="text-muted small mb-3">
-                                        This tool detects words that are syllabically ambiguous or may have different
-                                        pronunciations
-                                        depending on regional accents, dialects, or reading styles. These words can
-                                        cause issues
-                                        in rhyming picture books when used as end rhymes.
+                                        Identifies words with ambiguous syllable counts or inconsistent pronunciations or stresses 
+                                        across contexts, accents,
+                                        or reading styles. Click any word to highlight all instances in your manuscript.
                                     </p>
                                     <div class="form-check mb-3">
                                         <input class="form-check-input" type="checkbox" id="only-line-endings">
-                                        <label class="form-check-label" for="only-line-endings">
+                                        <label class="form-check-label text-muted small" for="only-line-endings">
                                             Only detect at line or sentence endings
                                             <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip"
                                                 title="When checked, only finds problematic rhyming words that appear at the end of lines or sentences - where they would typically be used as rhymes."></i>
