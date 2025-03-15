@@ -1051,104 +1051,148 @@
         class ReadabilityAnalyzer {
             // Syllable Counting Function
             static countSyllables(word) {
-                // Trim and convert to lowercase
-                word = word.toLowerCase().trim();
+                word = word.toLowerCase();
 
-                // Remove non-alphabetic characters
-                word = word.replace(/[^a-z]/g, '');
+                // exception_add are words that need extra syllables
+                // exception_del are words that need less syllables
+                const exception_add = ['serious', 'crucial'];
+                const exception_del = ['fortunately', 'unfortunately'];
 
-                // If word is empty, return 0
-                if (word.length === 0) return 0;
+                const co_one = ['cool', 'coach', 'coat', 'coal', 'count', 'coin', 'coarse', 'coup', 'coif', 'cook', 'coign', 'coiffe', 'coof', 'court'];
+                const co_two = ['coapt', 'coed', 'coinci'];
 
-                // Truly irregular words (rare exceptions)
-                const specialCases = {
-                    'colonel': 3,    // unique pronunciation
-                    'lengthwise': 2, // tricky syllable structure
-                    'squirrel': 2    // non-standard syllable break
-                };
+                const pre_one = ['preach'];
 
-                // Check special cases first
-                if (specialCases.hasOwnProperty(word)) {
-                    return specialCases[word];
+                let syls = 0; // added syllable number
+                let disc = 0; // discarded syllable number
+
+                // 1) if letters < 3 : return 1
+                if (word.length <= 3) {
+                    syls = 1;
+                    return syls;
                 }
 
-                // Preprocessing rules
-                // 1. Handle silent 'e' at the end
-                if (word.endsWith('e')) {
-                    // Remove silent 'e' for syllable counting, but with exceptions
-                    const exceptions = ['le', 'age', 'ige'];
-                    if (!exceptions.some(ex => word.endsWith(ex))) {
-                        word = word.slice(0, -1);
+                // 2) if doesn't end with "ted" or "tes" or "ses" or "ied" or "ies", discard "es" and "ed" at the end.
+                // if it has only 1 vowel or 1 set of consecutive vowels, discard. (like "speed", "fled" etc.)
+                if (word.slice(-2) === "es" || word.slice(-2) === "ed") {
+                    const doubleAndtripple_1 = (word.match(/[eaoui][eaoui]/g) || []).length;
+                    if (doubleAndtripple_1 > 1 || (word.match(/[eaoui][^eaoui]/g) || []).length > 1) {
+                    if (word.slice(-3) === "ted" || word.slice(-3) === "tes" || word.slice(-3) === "ses" || word.slice(-3) === "ied" || word.slice(-3) === "ies") {
+                        // pass
+                    } else {
+                        disc += 1;
+                    }
                     }
                 }
 
-                // Improved vowel group detection
-                // This regex looks for sequences of vowels that create distinct syllables
-                const syllableMatches = word.match(/[aeiouy]+/g) || [];
+                // 3) discard trailing "e", except where ending is "le"
+                const le_except = ['whole', 'mobile', 'pole', 'male', 'female', 'hale', 'pale', 'tale', 'sale', 'aisle', 'whale', 'while'];
 
-                // Base syllable count from vowel groups
-                let syllableCount = syllableMatches.length;
-
-                // Adjust for specific phonetic rules
-                // Diphthongs and triphthongs often count as one syllable
-                const diphthongs = ['ai', 'au', 'ea', 'ee', 'ei', 'ie', 'oa', 'oe', 'oo', 'ou'];
-                const complexVowelReduction = syllableMatches.filter(group =>
-                    diphthongs.includes(group) || group.length > 2
-                ).length;
-
-                // Adjust syllable count
-                syllableCount -= complexVowelReduction;
-
-                // Sophisticated handling of 'io' combinations
-                // Context-aware syllable adjustment
-                const complexWordPatterns = [
-                    // Patterns where 'io' is part of a single syllable
-                    /[aeiou]tion$/,   // action, fiction
-                    /^[aeiou]nion/,   // onion
-
-                    // Patterns where 'io' might split into two syllables
-                    /^li[oa]n/        // lion
-                ];
-
-                // Check if the word matches any of these patterns
-                const matchedPattern = complexWordPatterns.some(pattern => pattern.test(word));
-
-                // Adjust syllable count based on pattern matching
-                if (matchedPattern) {
-                    if (/^li[oa]n/.test(word)) {
-                        // Specifically handle words like 'lion'
-                        syllableCount++;
-                    } else if (/[aeiou]tion$/.test(word) || /^[aeiou]nion/.test(word)) {
-                        // Ensure correct syllable count for words like 'action', 'onion'
-                        syllableCount = syllableCount;
+                if (word.slice(-1) === "e") {
+                    if (word.slice(-2) === "le" && !le_except.includes(word)) {
+                    // pass
+                    } else {
+                    disc += 1;
                     }
                 }
 
-                // Ensure at least one syllable
-                syllableCount = Math.max(1, syllableCount);
+                // 4) check if consecutive vowels exists, triplets or pairs, count them as one.
+                const doubleAndtripple = (word.match(/[eaoui][eaoui]/g) || []).length;
+                const tripple = (word.match(/[eaoui][eaoui][eaoui]/g) || []).length;
+                disc += doubleAndtripple + tripple;
 
-                // Prevent unreasonably high syllable counts
-                syllableCount = Math.min(syllableCount, word.length);
+                // 5) count remaining vowels in word.
+                const numVowels = (word.match(/[eaoui]/g) || []).length;
 
-                return syllableCount;
-            }
+                // 6) add one if starts with "mc"
+                if (word.slice(0, 2) === "mc") {
+                    syls += 1;
+                }
 
-            // Utility function to remove art notes and clean text
-            /*static removeArtNotes(text) {
-                // Remove text within square brackets or parentheses that might be art notes
-                return text.replace(/\[.*?\]|\(.*?\)/g, '');
-            }*/
+                // 7) add one if ends with "y" but is not surrounded by vowel
+                if (word.slice(-1) === "y" && !["a", "e", "o", "u", "i"].includes(word.slice(-2, -1))) {
+                    if ((word.slice(-3) === "ely") || (word.slice(-3) === "ety")) {
+                    // Skip adding a syllable for -ly endings
+                    } else {
+                    syls += 1;
+                    }
+                }
 
-            // Utility function to get words from text
-            /*static getWordsFromText(text) {
-                // Clean the text and split into words
-                return text.toLowerCase()
-                    .replace(/["".,\/#—!$%\^&\*;:{}=\_`''~()?"…\[\]]/g, ' ')
-                    .replace(/(^|\s)-|-(\s|$)/g, ' ')
-                    .replace(/\s{2,}/g, ' ')
-                    .trim()
-                    .split(/\s+/);
-            }*/
+                // 8) add one if "y" is surrounded by non-vowels and is not in the last word.
+                for (let i = 0; i < word.length; i++) {
+                    if (word[i] === "y") {
+                    if (i !== 0 && i !== word.length - 1) {
+                        if (!["a", "e", "o", "u", "i"].includes(word[i - 1]) && !["a", "e", "o", "u", "i"].includes(word[i + 1])) {
+                        syls += 1;
+                        }
+                    }
+                    }
+                }
+
+                // 9) if starts with "tri-" or "bi-" and is followed by a vowel, add one.
+                if (word.slice(0, 3) === "tri" && word.length > 3 && ["a", "e", "o", "u", "i"].includes(word[3])) {
+                    syls += 1;
+                }
+
+                if (word.slice(0, 2) === "bi" && word.length > 2 && ["a", "e", "o", "u", "i"].includes(word[2])) {
+                    syls += 1;
+                }
+
+                // 10) if ends with "-ian", should be counted as two syllables, except for "-tian" and "-cian"
+                if (word.slice(-3) === "ian") {
+                    if (word.length > 4 && (word.slice(-4) === "cian" || word.slice(-4) === "tian")) {
+                    // pass
+                    } else {
+                    syls += 1;
+                    }
+                }
+
+                // 11) if starts with "co-" and is followed by a vowel, check if exists in the double syllable dictionary, if not, check if in single dictionary and act accordingly.
+                if (word.slice(0, 2) === "co" && word.length > 2 && ["a", "e", "o", "u", "i"].includes(word[2])) {
+                    if (co_two.includes(word.slice(0, 4)) || co_two.includes(word.slice(0, 5)) || co_two.includes(word.slice(0, 6))) {
+                    syls += 1;
+                    } else if (co_one.includes(word.slice(0, 4)) || co_one.includes(word.slice(0, 5)) || co_one.includes(word.slice(0, 6))) {
+                    // pass
+                    } else {
+                    syls += 1;
+                    }
+                }
+
+                // 12) if starts with "pre-" and is followed by a vowel, check if exists in the double syllable dictionary, if not, check if in single dictionary and act accordingly.
+                if (word.slice(0, 3) === "pre" && word.length > 3 && ["a", "e", "o", "u", "i"].includes(word[3])) {
+                    if (pre_one.includes(word.slice(0, 6))) {
+                    // pass
+                    } else {
+                    syls += 1;
+                    }
+                }
+
+                // 13) check for "-n't" and cross match with dictionary to add syllable.
+                const negative = ["doesn't", "isn't", "shouldn't", "couldn't", "wouldn't"];
+
+                if (word.slice(-3) === "n't") {
+                    if (negative.includes(word)) {
+                    syls += 1;
+                    } else {
+                    // pass
+                    }
+                }
+
+                // 14) Handling the exceptional words.
+                if (exception_del.includes(word)) {
+                    disc += 1;
+                }
+
+                if (exception_add.includes(word)) {
+                    syls += 1;
+                }
+
+                // calculate the output
+                const result = numVowels - disc + syls;
+
+                // Ensure at least 1 syllable for any word
+                return Math.max(1, result);
+                }
 
             // Analyze Readability
             static analyze(text) {
