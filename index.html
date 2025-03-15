@@ -2841,87 +2841,112 @@
         }
 
         function setupCustomQuillPasteHandler(quill) {
-            // Get the editing area element (Quill's contenteditable div)
-            const editorElement = quill.root;
-            
-            // Add event listener for paste event directly on the editor element
-            editorElement.addEventListener('paste', function(e) {
-                // We need to let the paste happen, then clean it after
-                setTimeout(() => {
-                    // Get the HTML content after paste
-                    const html = quill.root.innerHTML;
-                    console.log('HTML after paste:', html);
-
-                    // Clean the HTML
-                    const cleanedHtml = cleanDocumentComments(html);
-                    console.log('HTML after cleaning:', cleanedHtml);
-
-                    // If the HTML changed (comments were removed), update the editor
-                    if (cleanedHtml !== html) {
-                        
-                        // Save current selection
-                        const range = quill.getSelection();
-                        
-                        // Set new content
-                        quill.root.innerHTML = cleanedHtml;
-                        
-                        // Restore selection if it existed
-                        if (range) {
-                        quill.setSelection(range);
-                        }
+            // Add a paste event listener directly to the Quill editor element
+            quill.root.addEventListener('paste', function(e) {
+                // Prevent the default paste behavior
+                e.preventDefault();
+                
+                // Get clipboard data
+                const clipboardData = e.clipboardData || window.clipboardData;
+                
+                // Check if we have HTML content in the clipboard
+                let html = clipboardData.getData('text/html');
+                
+                if (html) {
+                    console.log("Intercepted paste with HTML content:\n", html);
+                    
+                    // Clean the HTML before Quill processes it
+                    html = cleanDocumentComments(html);
+                    console.log("Cleaned HTML: \n", html);
+                    
+                    // Get current selection
+                    const range = quill.getSelection(true);
+                    
+                    // Insert the cleaned HTML at the cursor position
+                    quill.clipboard.dangerouslyPasteHTML(range.index, html);
+                    } else {
+                    // If there's no HTML, just paste plain text
+                    const text = clipboardData.getData('text/plain');
+                    if (text) {
+                        const range = quill.getSelection(true);
+                        quill.insertText(range.index, text);
                     }
-                }, 0);
+                }
             });
         }
 
-        // Add the cleanDocumentComments function
+        // Instead of using regex to match and remove the comment list, let's try using DOM 
+        // parsing to more reliably identify and remove the comment section (to handle the 
+        // nested HTML structure of the comment list)
         function cleanDocumentComments(html) {
             if (!html || typeof html !== 'string') return html;
             
-            // Microsoft Word comment patterns
-            // Remove comment reference links with their markers
-            html = html.replace(/<a\s+href="#_msocom_\d+"[^>]*>\[\w+\d*\]<\/a>/gi, '');
+            console.log("Cleaning clipboard HTML content");
             
-            // Remove entire paragraphs containing comment anchors and their text
-            html = html.replace(/<p[^>]*>\s*&nbsp;\s*<a\s+href="#_msoanchor_\d+"[^>]*>\[\w+\d*\]<\/a>.*?<\/p>/gi, '');
+            // Create a temporary DOM element to parse the HTML
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
             
-            // If the above doesn't catch all instances, target the anchor and following text directly
-            const anchorRegex = /<a\s+href="#_msoanchor_\d+"[^>]*>\[\w+\d*\]<\/a>(.*?)(?=<\/p>|<p>|$)/gi;
-            html = html.replace(anchorRegex, '');
+            // STEP 1: Remove the entire comment list section using DOM traversal
+            const commentLists = tempDiv.querySelectorAll('div[style*="mso-element:comment-list"]');
+            commentLists.forEach(list => {
+                list.parentNode.removeChild(list);
+            });
             
-            // Remove comment reference spans
-            html = html.replace(/<span\s+(?:[^>]*\s+)?class="(?:[^"]*\s+)?(?:MsoCommentReference|CommentReference)(?:\s+[^"]*)?[^>]*>[\s\S]*?<\/span>/gi, '');
+            // STEP 2: Remove tracked changes
+            // Remove tracked deletions (text marked as deleted)
+            const deletions = tempDiv.querySelectorAll('.msoDel, del, span[class*="msoDel"]');
+            deletions.forEach(del => {
+                del.parentNode.removeChild(del);
+            });
             
-            // Remove comment text and content
-            html = html.replace(/<div\s+(?:[^>]*\s+)?class="(?:[^"]*\s+)?(?:MsoCommentText|CommentText)(?:\s+[^"]*)?[^>]*>[\s\S]*?<\/div>/gi, '');
+            // Keep only the inserted text in tracked insertions
+            const insertions = tempDiv.querySelectorAll('.msoIns, ins, span[class*="msoIns"]');
+            insertions.forEach(ins => {
+                // Replace the insertion span with just its content
+                const parent = ins.parentNode;
+                while (ins.firstChild) {
+                parent.insertBefore(ins.firstChild, ins);
+                }
+                parent.removeChild(ins);
+            });
             
-            // Remove Word comment markers like [NC1], [EC1], [NN2], etc.
-            html = html.replace(/\[(?:\w+\d*)\]/g, '');
+            // STEP 3: Remove comment references and anchors
+            // Remove all comment reference elements
+            tempDiv.querySelectorAll('a[href^="#_msocom_"], a[href^="#_msoanchor_"], a[class*="msocomanchor"]').forEach(comment => {
+                comment.parentNode.removeChild(comment);
+            });
             
-            // Google Docs comment patterns
-            // Remove Google comment elements
-            html = html.replace(/<span\s+(?:[^>]*\s+)?(?:id="cmnt\d+"[^>]*|class="[^"]*\bgoogle-docs-comment\b[^"]*")[\s\S]*?<\/span>/gi, '');
+            // Remove comment brackets with text nodes (harder with DOM, we'll use the cleaned HTML later)
             
-            // Remove Google suggestion spans (another format they sometimes use)
-            html = html.replace(/<span\s+[^>]*data-suggestion-thread-id[^>]*>[\s\S]*?<\/span>/gi, '');
+            // STEP 4: Remove all conditional comments for Word comment system
+            const allElements = tempDiv.querySelectorAll('*');
+            for (let i = 0; i < allElements.length; i++) {
+                const element = allElements[i];
+                // Remove comment reference spans
+                if (element.classList && 
+                    (element.classList.contains('MsoCommentReference') || 
+                    element.classList.contains('msocomtxt') ||
+                    element.classList.contains('msocomanchor'))) {
+                element.parentNode.removeChild(element);
+                }
+            }
             
-            // Remove any hidden comment sections
-            html = html.replace(/<div\s+[^>]*(?:comment-section|docs-comment)[^>]*>[\s\S]*?<\/div>/gi, '');
+            // Get the cleaned HTML
+            let cleanedHtml = tempDiv.innerHTML;
             
-            // Fix the specific case of extra whitespace between "Art Notes" and the colon
-            html = html.replace(/Art Notes<\/span><span[^>]*>&nbsp;<\/span>\s*&nbsp;\s*<span[^>]*>:/gi, 
-                                'Art Notes</span><span style="color: rgb(79, 129, 189);">:</span><span style="color: rgb(79, 129, 189);">');
+            // Use regex for things that are harder to clean with DOM manipulation
+            // Remove comment brackets [XYZ123]
+            cleanedHtml = cleanedHtml.replace(/\[[A-Z]+\d+\]/gi, '');
             
-            // Clean up multiple consecutive spaces (often left after comment removal)
-            html = html.replace(/(&nbsp;|\s){2,}/gi, ' ');
+            // Remove Word-specific conditional comments
+            cleanedHtml = cleanedHtml.replace(/<!(?:\[if [^\]]*?\]|\[endif\])>/gi, '');
             
-            // Clean up empty paragraphs
-            html = html.replace(/<p[^>]*>\s*(?:&nbsp;)?\s*<\/p>/gi, '');
+            // Clean up any remaining special character spans for comments
+            cleanedHtml = cleanedHtml.replace(/<span\s+style=['"]mso-special-character:comment['"][^>]*>[\s\S]*?<\/span>/gi, '');
             
-            return html;
-        }
-
-
+            return cleanedHtml;
+            }
         
     </script>
 </body>
