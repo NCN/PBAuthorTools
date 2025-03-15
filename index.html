@@ -2861,11 +2861,11 @@
                 let html = clipboardData.getData('text/html');
                 
                 if (html) {
-                    console.log("Intercepted paste with HTML content:\n", html);
+                    //console.log("Intercepted paste with HTML content:\n", html);
                     
                     // Clean the HTML before Quill processes it
                     const cleanedHtml = cleanDocumentComments(html);
-                    console.log("Cleaned HTML: \n", cleanedHtml);
+                    //console.log("Cleaned HTML: \n", cleanedHtml);
                     
                     // Get current selection
                     const range = quill.getSelection(true);
@@ -2953,6 +2953,10 @@
             // Clean up any remaining special character spans for comments
             cleanedHtml = cleanedHtml.replace(/<span\s+style=['"]mso-special-character:comment['"][^>]*>[\s\S]*?<\/span>/gi, '');
             
+            // Google Docs: Convert standalone <br /> tags to proper paragraph elements with non-breaking spaces. Without
+            // this, blank lines between spreads are removed.
+            cleanedHtml = cleanedHtml.replace(/<br\s*\/?>\s*(?=<p)/g, '<p>&nbsp;</p>');
+
             return cleanedHtml;
             }
         
