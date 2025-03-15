@@ -2840,10 +2840,18 @@
                 .split(/\s+/);
         }
 
+        
+        // Custom handler to intercept paste into quill editor and clean HTML (remove comments
+        // and tracked changes) before manually pasting
         function setupCustomQuillPasteHandler(quill) {
-            // Add a paste event listener directly to the Quill editor element
-            quill.root.addEventListener('paste', function(e) {
-                // Prevent the default paste behavior
+            // Get the editor element
+            const editorElement = quill.root;
+            
+            // The key is to add our listener with the 'capture' phase
+            // This ensures our handler runs before Quill's handlers
+            editorElement.addEventListener('paste', function(e) {
+                // Immediately stop propagation and prevent default
+                e.stopPropagation();
                 e.preventDefault();
                 
                 // Get clipboard data
@@ -2856,15 +2864,15 @@
                     console.log("Intercepted paste with HTML content:\n", html);
                     
                     // Clean the HTML before Quill processes it
-                    html = cleanDocumentComments(html);
-                    console.log("Cleaned HTML: \n", html);
+                    const cleanedHtml = cleanDocumentComments(html);
+                    console.log("Cleaned HTML: \n", cleanedHtml);
                     
                     // Get current selection
                     const range = quill.getSelection(true);
                     
                     // Insert the cleaned HTML at the cursor position
-                    quill.clipboard.dangerouslyPasteHTML(range.index, html);
-                    } else {
+                    quill.clipboard.dangerouslyPasteHTML(range.index, cleanedHtml);
+                } else {
                     // If there's no HTML, just paste plain text
                     const text = clipboardData.getData('text/plain');
                     if (text) {
@@ -2872,7 +2880,7 @@
                         quill.insertText(range.index, text);
                     }
                 }
-            });
+            }, true); // The 'true' here enables capture phase
         }
 
         // Instead of using regex to match and remove the comment list, let's try using DOM 
