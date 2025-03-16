@@ -1645,11 +1645,11 @@
                 if (onlyLineEndings) {
                     // Filter for problematic rhyme words at line/sentence endings
                     const rhymeWordsFound = detectRhymeWordsAtEndings(text, problematicRhymeWords);
-                    displaySpecialWordsList(rhymeWordsFound, 'rhyme-words-list', 'Syllabically ambiguous words at line/sentence endings');
+                    displaySpecialWordsList(rhymeWordsFound, 'rhyme-words-list', 'Problematic rhyme words at line/sentence endings');
                 } else {
                     // Original function for finding anywhere in text
                     const rhymeWordsFound = detectSpecialWords(text, problematicRhymeWords);
-                    displaySpecialWordsList(rhymeWordsFound, 'rhyme-words-list', 'Syllabically ambiguous words');
+                    displaySpecialWordsList(rhymeWordsFound, 'rhyme-words-list', 'Problematic rhyme words');
                 }
             });
 

@@ -9,7 +9,7 @@ This project uses a modern, serverless architecture with several interconnected 
 ### 1. Web Application (Frontend)
 
 - **Technology**: HTML, CSS, JavaScript, Bootstrap 5, Quill.js editor
-- **Hosting**: GitHub Pages with custom subdomain (`pbtools.hellonathan.ca`)
+- **Hosting**: GitHub Pages with custom subdomain (`authortools.hellonathan.ca`)
 - **Key Features**:
   - Rich text editor for manuscript editing
   - Real-time word count and art note detection
@@ -46,7 +46,7 @@ This project uses a modern, serverless architecture with several interconnected 
 ### 4. DNS & Domain Configuration
 
 - **Primary Domain**: `hellonathan.ca` 
-- **Subdomain**: `pbtools.hellonathan.ca`
+- **Subdomain**: `authortools.hellonathan.ca`
 - **DNS Configuration**:
   - CNAME record pointing to GitHub Pages
   - TXT records for domain verification
