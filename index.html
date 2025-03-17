@@ -385,6 +385,8 @@
         }
     </style>
 
+    <script src="version.js"></script>
+
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6P7RCTZ8NX"></script>
     <script>
@@ -911,6 +913,9 @@
                         <li class="list-inline-item">
                             <a href="https://hellonathan.ca/authortools-support" target="_blank">Support</a>
                         </li>
+                        <li class="list-inline-item float-end text-muted">
+                            <small id="site-version">v1.0.0</small>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -1295,7 +1300,13 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            // Variables for tracking mouse donw/up text selection
+            // For site version tracking in the footer
+            const versionElement = document.getElementById('site-version');
+            if (window.SITE_VERSION) {
+                versionElement.textContent = `v${window.SITE_VERSION.version} (${window.SITE_VERSION.buildDate})`;
+            }
+
+            // Variables for tracking mouse down/up text selection
             let isSelectingText = false;
             let selectionTimeout = null;
 

@@ -1,0 +1,28 @@
+name: Update Version Info
+
+on:
+  push:
+    branches: [ main ]  # Change to your main branch name if different
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Generate Version Info
+        run: |
+          BUILD_DATE=$(date '+%Y-%m-%d')
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          echo "window.SITE_VERSION = {" > version.js
+          echo "  version: \"1.0.0\"," >> version.js
+          echo "  buildDate: \"$BUILD_DATE\"," >> version.js
+          echo "  commit: \"$COMMIT_HASH\"" >> version.js
+          echo "};" >> version.js
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: .
+          branch: gh-pages  # Change if your deployment branch is different
