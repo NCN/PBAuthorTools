@@ -1,0 +1,3117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Picture Book Author Tools</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.2/dist/quill.snow.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicons -->
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" href="favicon-16x16.png" sizes="16x16" type="image/png">
+    <link rel="icon" href="favicon-32x32.png" sizes="32x32" type="image/png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .editor-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            /* Set minimum height to match the height of the right panel */
+            min-height: 525px;
+            /* Adjust this value as needed */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Adjust the Quill editor to fill the available space */
+        .ql-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ql-editor {
+            flex-grow: 1;
+            min-height: 300px;
+            /* Set minimum height for the editor itself */
+            max-height: none;
+            /* Override the existing max-height property */
+        }
+
+        .stats-panel {
+            background-color: #f0f7ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card {
+            height: 100%;
+            transition: transform 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .icon-feature {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #5c7cfa;
+        }
+
+        .authentication-panel {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .ql-editor {
+            min-height: 200px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .privacy-notice {
+            font-size: 0.85rem;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .btn-donate {
+            background-color: #ff813f;
+            color: white;
+        }
+
+        .btn-donate:hover {
+            background-color: #e56e2c;
+            color: white;
+        }
+
+        .word-cloud-container {
+            height: 300px;
+            background-color: white;
+            border-radius: 8px;
+            margin-top: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #login-section {
+            display: block;
+        }
+
+        #editor-section {
+            display: none;
+        }
+
+        #word-freq-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Art note styling */
+        .art-note {
+            color: #d9534f !important;
+            font-style: italic !important;
+            background-color: rgba(217, 83, 79, 0.1) !important;
+            border-radius: 3px;
+        }
+
+        /* Readability analysis styling */
+        .readability-results {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-card {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: transform 0.2s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4263eb;
+        }
+
+        .metric-label {
+            color: #495057;
+            font-size: 0.9rem;
+        }
+
+        .age-recommendation {
+            background-color: #e3faff;
+            border-left: 4px solid #00bcd4;
+        }
+
+        .reading-ease {
+            background-color: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
+
+        .school-level {
+            background-color: #f8f9fa; /* Match other cards */
+            border-left: none; /* Remove the blue accent line */
+        }
+
+        /* Playful and Creative Style (No Emoji) */
+        h1.fw-bold {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-weight: 800;
+            color: #333;
+            border-bottom: 3px solid #ff813f;
+            padding-bottom: 6px;
+            display: inline-block;
+            /* Makes the border only as wide as the text */
+        }
+
+        /* Optional: Add a subtle transition for hover effect */
+        h1.fw-bold {
+            transition: transform 0.2s ease, border-color 0.3s ease;
+        }
+
+        h1.fw-bold:hover {
+            border-color: #e56e2c;
+            /* Slightly darker orange on hover */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            h1.fw-bold {
+                padding-bottom: 4px;
+                border-bottom-width: 2px;
+                display: block;
+                /* Make the element a block for full width */
+                width: 100%;
+                /* Ensure it takes full width */
+            }
+        }
+
+        /* For extra small screens - ensure the title and underline are fully visible */
+        @media (max-width: 480px) {
+            h1.fw-bold {
+                font-size: 1.25rem;
+                margin-bottom: 0;
+                display: block;
+                width: 100%;
+            }
+        }
+
+        /* Add this to your existing style section */
+        @media (max-width: 1224px) {
+            header.d-flex.justify-content-between {
+                flex-direction: column;
+                align-items: start !important;
+            }
+
+            header.d-flex.justify-content-between>div {
+                margin-top: 0.75rem;
+                width: 100%;
+                justify-content: flex-start;
+                /* Left align buttons */
+            }
+
+            /* Button container */
+            header.d-flex.justify-content-between>div {
+                display: flex;
+                gap: 0.5rem;
+                align-items: stretch;
+            }
+
+            /* Individual buttons */
+            header.d-flex.justify-content-between>div a.btn {
+                font-size: 0.9rem;
+                padding: 0.35rem 0.7rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 38px;
+                box-sizing: border-box;
+                flex: 0 0 auto;
+                /* Don't expand to fill space */
+                max-width: 200px;
+                /* Maximum width for buttons */
+            }
+        }
+
+        /* Adjust header elements alignment on small screens */
+        @media (max-width: 480px) {
+            header.d-flex.justify-content-between h1.fw-bold {
+                font-size: 1.25rem;
+                margin-bottom: 0;
+            }
+        }
+
+
+        /* Default state - show full text, hide short text */
+        .suggest-short-text {
+            display: none;
+        }
+
+        .suggest-full-text {
+            display: inline;
+        }
+
+        /* On smaller screens, swap visibility */
+        @media (max-width: 768px) {
+            .suggest-short-text {
+                display: inline;
+            }
+
+            .suggest-full-text {
+                display: none;
+            }
+        }
+
+        /* Make button more compact on very small screens */
+        #suggest-feature-btn {
+            padding: 0.35rem 0.7rem;
+            font-size: 0.9rem;
+        }
+
+        /* Logout button responsive styling */
+        .logout-short-text {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+
+            .username-text,
+            .logout-text {
+                display: none;
+            }
+
+            .logout-short-text {
+                display: inline;
+            }
+
+            #logout-button {
+                padding: 0.35rem 0.7rem;
+            }
+        }
+
+        /* Coffee button responsive styling */
+        .coffee-short-text {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .coffee-full-text {
+                display: none;
+            }
+
+            .coffee-short-text {
+                display: inline;
+            }
+        }
+
+        .footer-author-container {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .author-credit {
+            margin: 0;
+            padding: 0;
+        }
+
+        .about-btn {
+            white-space: nowrap;
+            margin-left: 0.75rem;
+        }
+
+        /* Ensure they stay on the same line on mobile */
+        @media (max-width: 576px) {
+            .footer-author-container {
+                display: flex;
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .author-credit {
+                font-size: 1rem;
+            }
+        }
+
+        /* Sign in button responsive styling */
+        #sign-in-button {
+            display: none;
+            /* Hidden by default */
+        }
+
+        @media (max-width: 768px) {
+            #sign-in-button {
+                display: inline;
+                /* Show on mobile */
+            }
+        }
+
+        /* Make Sign In button text match other buttons */
+        #sign-in-button {
+            font-size: 0.9rem;
+            /* Match the size of the other buttons */
+        }
+
+        /* Make Logout button text match other buttons */
+        #logout-button {
+            font-size: 0.9rem;
+            /* Match the size of the other buttons */
+        }
+    </style>
+
+    <script src="version.js"></script>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6P7RCTZ8NX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-6P7RCTZ8NX');
+    </script>
+</head>
+
+<body>
+    <div class="container py-4">
+        <header class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold">Picture Book Author Tools</h1>
+            <div>
+                <!--<a href="https://hellonathan.ca/nerdy-stuff-for-authors/pb-author-tools/" class="btn btn-outline-primary" target="_blank">
+                    <i class="fab fa-google me-2"></i>Google Docs Add-on
+                </a>-->
+                <!--<a href="https://buymeacoffee.com/hellonathanc" class="btn btn-donate ms-2" target="_blank">
+                    <i class="fas fa-mug-hot me-2"></i>Buy Me a Coffee
+                </a>-->
+                <a href="https://buymeacoffee.com/hellonathanc" class="btn btn-donate ms-2" target="_blank">
+                    <i class="fas fa-mug-hot me-2"></i>
+                    <span class="coffee-full-text">Buy Me a Coffee</span>
+                    <span class="coffee-short-text">Donate</span>
+                </a>
+                <button id="suggest-feature-btn" class="btn btn-primary ms-2">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    <span class="suggest-full-text">Suggest a Feature!</span>
+                    <span class="suggest-short-text">Suggest</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Login Section -->
+        <div id="login-section" class="authentication-panel">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Welcome to Picture Book Author Tools</h3>
+                    <p>This tool helps KidLit authors analyze their manuscripts, generate accurate word counts, and
+                        more.</p>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item bg-transparent"><i
+                                class="fas fa-check-circle text-success me-2"></i>Accurate word count (automatically
+                            excluding art notes)</li>
+                        <li class="list-group-item bg-transparent"><i
+                                class="fas fa-check-circle text-success me-2"></i>Spot overused words with visual word
+                            clouds and frequency analysis</li>
+                        <li class="list-group-item bg-transparent"><i
+                                class="fas fa-check-circle text-success me-2"></i>Identify problematic rhyming words
+                            with ambiguous pronunciation</li>
+                        <li class="list-group-item bg-transparent"><i
+                                class="fas fa-check-circle text-success me-2"></i>Remove all art notes with a single
+                            click</li>
+                        <li class="list-group-item bg-transparent"><i
+                                class="fas fa-check-circle text-success me-2"></i>Flesch–Kincaid readability analysis
+                            and grade-level</li>
+                    </ul>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Your manuscript stays on your device. We never store or process your text on our servers.
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div id="auth-panel" class="card">
+                        <div class="card-body">
+                            <!--<h4 class="card-title">Access Picture Book Author Tools</h4>-->
+                            <div class="alert alert-info mb-3">
+                                <i class="fas fa-check-circle me-2 text-success"></i>
+                                By creating a free account on Picture Book Author Tools, you'll also be subscribed to <a
+                                    href="https://hellonathan.substack.com/" target="_blank" class="alert-link">Nathan
+                                    Christopher's free Substack newsletter</a>
+                            </div>
+
+                            <!-- Login/Signup Tabs -->
+                            <ul class="nav nav-tabs mb-3" id="auth-tabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="login-tab" data-bs-toggle="tab"
+                                        data-bs-target="#login-pane" type="button" role="tab">Log In</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="signup-tab" data-bs-toggle="tab"
+                                        data-bs-target="#signup-pane" type="button" role="tab">Sign Up</button>
+                                </li>
+                            </ul>
+
+                            <!-- Tab Content -->
+                            <div class="tab-content" id="auth-tab-content">
+                                <!-- Login Pane -->
+                                <div class="tab-pane fade show active" id="login-pane" role="tabpanel">
+                                    <form id="login-form">
+                                        <div id="login-message" class="mb-3"></div>
+                                        <div class="mb-3">
+                                            <label for="login-email" class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="login-email" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="login-password" class="form-label">Password</label>
+                                            <input type="password" class="form-control" id="login-password" required>
+                                        </div>
+                                        <div class="d-grid mb-3">
+                                            <button type="submit" class="btn btn-primary">Log In</button>
+                                        </div>
+                                        <div class="mb-3 text-center">
+                                            <small><a href="#" id="forgot-password-link">Forgot Password?</a></small>
+                                        </div>
+                                    </form>
+
+                                    <div class="text-center mb-3">
+                                        <small class="text-muted">Or log in with</small>
+                                    </div>
+
+                                    <div class="d-grid gap-2">
+                                        <button id="google-login-btn" class="btn btn-outline-secondary">
+                                            <i class="fab fa-google me-2"></i>Continue with Google
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Signup Pane -->
+                                <div class="tab-pane fade" id="signup-pane" role="tabpanel">
+                                    <!--<div class="alert alert-info mb-3">
+                                <i class="fas fa-check-circle me-2 text-success"></i>
+                                By creating an account, you agree to be subscribed to <a href="https://hellonathan.substack.com/" target="_blank" class="alert-link">Nathan Christopher's free Substack newsletter</a>
+                              </div>-->
+                                    <form id="signup-form">
+                                        <div id="signup-message" class="mb-3"></div>
+                                        <div class="mb-3">
+                                            <label for="signup-email" class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="signup-email" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="signup-password" class="form-label">Choose your password</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control" id="signup-password"
+                                                    required>
+                                                <button class="btn btn-outline-secondary password-toggle" type="button">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="signup-confirm-password" class="form-label">Confirm
+                                                password</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control" id="signup-confirm-password"
+                                                    required>
+                                                <button class="btn btn-outline-secondary password-toggle" type="button">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="d-grid mb-3">
+                                            <button type="submit" class="btn btn-primary">Create Account</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!--<div id="auth-message" class="mt-3"></div>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Editor Section (Hidden until logged in) -->
+        <div id="editor-section">
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <div class="editor-container">
+                        <p class="text-muted small">Paste your text below. Art notes will be highlighted automatically.
+                        </p>
+                        <div id="editor"></div>
+                        <p class="privacy-notice mt-2">
+                            <i class="fas fa-shield-alt me-1"></i> Your manuscript never leaves your browser. No text is
+                            sent to our servers or stored.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-panel">
+                        <h4>Manuscript Stats</h4>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Text Word Count:</span>
+                            <span id="text-word-count" class="fw-bold">0</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Art Notes Word Count:</span>
+                            <span id="art-notes-word-count" class="fw-bold">0</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Total Word Count:</span>
+                            <span id="total-word-count" class="fw-bold">0</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Number of Art Notes:</span>
+                            <span id="art-notes-count" class="fw-bold">0</span>
+                        </div>
+                    </div>
+
+                    <div class="accordion" id="featuresAccordion">
+                        <!-- NEW READABILITY ANALYSIS ACCORDION ITEM -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#readabilityCollapse">
+                                    <i class="fas fa-book-reader me-2"></i> Readability Analysis
+                                </button>
+                            </h2>
+                            <div id="readabilityCollapse" class="accordion-collapse collapse"
+                                data-bs-parent="#featuresAccordion">
+                                <div class="accordion-body">
+                                    <p class="text-muted small mb-3">
+                                        Measures text complexity with Flesch–Kincaid metrics. Higher "Reading-Ease" scores indicate easier readability, while "Grade Level" shows U.S. grade equivalent. Helps ensure your writing matches your intended audience.
+                                        <a href="https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests" target="_blank">Read more on Wikipedia</a>
+                                    </p>                                    
+                                    <button id="analyze-readability" class="btn btn-sm btn-primary mb-3">Analyze
+                                        Readability</button>
+                                    <div class="readability-results" style="display: none;" id="readability-results">
+                                        <div class="row">
+                                            <!-- Word Count -->
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card" data-bs-toggle="tooltip" title="Total number of words in the text, excluding art notes">
+                                                    <div class="metric-value" id="word-count">0</div>
+                                                    <div class="metric-label">Word Count</div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Sentence Count -->
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card" data-bs-toggle="tooltip" title="Total number of sentences in the text">
+                                                    <div class="metric-value" id="sentence-count">0</div>
+                                                    <div class="metric-label">Sentence Count</div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Avg Words Per Sentence -->
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card" data-bs-toggle="tooltip" title="Average number of words in each sentence">
+                                                    <div class="metric-value" id="avg-words-per-sentence">0</div>
+                                                    <div class="metric-label">Avg Words Per Sentence</div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Avg Syllables Per Word -->
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card" data-bs-toggle="tooltip" title="Average number of syllables in each word">
+                                                    <div class="metric-value" id="avg-syllables-per-word">0</div>
+                                                    <div class="metric-label">Avg Syllables Per Word</div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Grade Level -->
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card" data-bs-toggle="tooltip" title="Flesch-Kincaid Grade Level - numerical score representing the U.S. grade level needed to understand the text">
+                                                    <div class="metric-value" id="flesch-kincaid-grade">0</div>
+                                                    <div class="metric-label">Grade Level Score</div>
+                                                </div>
+                                            </div>
+                                            <!-- Reading Ease Score -->
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card" data-bs-toggle="tooltip" title="Flesch Reading Ease - higher score means easier to read (100=very easy, 0=very difficult)">
+                                                    <div class="metric-value" id="flesch-reading-ease">0</div>
+                                                    <div class="metric-label">Reading-Ease Score</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card" data-bs-toggle="tooltip" title="Grade level based on Flesch Reading Ease score — ranges from Professional (0-10) to 5th grade (90+)">
+                                                    <div class="metric-value" id="school-level">-</div>
+                                                    <div class="metric-label">Reading-Ease School Level</div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Complex Word Percentage -->
+                                            <div class="col-md-6 mb-2">
+                                                <div class="metric-card" data-bs-toggle="tooltip" title="Percentage of words with 3 or more syllables">
+                                                    <div class="metric-value" id="complex-word-percentage">0%</div>
+                                                    <div class="metric-label">Complex Words (3+ syllables)</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#wordCloudCollapse">
+                                    <i class="fas fa-cloud me-2"></i> Word Cloud
+                                </button>
+                            </h2>
+                            <div id="wordCloudCollapse" class="accordion-collapse collapse"
+                                data-bs-parent="#featuresAccordion">
+                                <div class="accordion-body">
+                                    <p class="text-muted small mb-3">
+                                        Visualizes word frequency with larger text for commonly used words. Helps identify repetitive word usage and improve vocabulary variety. Click any word to highlight all instances in your manuscript.
+                                    </p>                                    
+                                    <button id="generate-word-cloud" class="btn btn-sm btn-primary mb-2">Generate Word Cloud</button>
+                                    <div id="word-cloud-container" class="word-cloud-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#wordFrequencyCollapse">
+                                    <i class="fas fa-list-ol me-2"></i> Word Frequency
+                                </button>
+                            </h2>
+                            <div id="wordFrequencyCollapse" class="accordion-collapse collapse"
+                                data-bs-parent="#featuresAccordion">
+                                <div class="accordion-body">
+                                    <p class="text-muted small mb-3">
+                                        Lists words by frequency to help identify repetitive word usage and improve vocabulary variety. Click any word to highlight all occurrences.
+                                    </p>                                    
+                                    <button id="generate-word-freq" class="btn btn-sm btn-primary mb-2">Generate Frequency List</button>
+                                    <div id="word-freq-list" class="list-group">
+                                        <!-- Word frequency items will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#adverbsCollapse">
+                                    <i class="fas fa-highlighter me-2"></i> Adverb Detector
+                                </button>
+                            </h2>
+                            <div id="adverbsCollapse" class="accordion-collapse collapse"
+                                data-bs-parent="#featuresAccordion">
+                                <div class="accordion-body">
+                                    <p class="text-muted small mb-3">
+                                        Identifies adverbs (often ending in "-ly") that may weaken your writing. Replace with stronger verbs for more vivid descriptions. Click any adverb to highlight all instances in your manuscript.
+                                    </p>                                    
+                                    <button id="detect-adverbs" class="btn btn-sm btn-primary mb-2">Detect
+                                        Adverbs</button>
+                                    <div id="adverbs-list" class="list-group">
+                                        <!-- Adverbs will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#rhymeWordsCollapse">
+                                    <i class="fas fa-music me-2"></i> Rhyme Tool
+                                </button>
+                            </h2>
+                            <div id="rhymeWordsCollapse" class="accordion-collapse collapse"
+                                data-bs-parent="#featuresAccordion">
+                                <div class="accordion-body">
+                                    <p class="text-muted small mb-3">
+                                        Identifies words with ambiguous syllable counts or inconsistent pronunciations or stresses 
+                                        across contexts, accents,
+                                        or reading styles. Click any word to highlight all instances in your manuscript.
+                                    </p>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="only-line-endings">
+                                        <label class="form-check-label text-muted small" for="only-line-endings">
+                                            Only detect at line or sentence endings
+                                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip"
+                                                title="When checked, only finds problematic rhyming words that appear at the end of lines or sentences - where they would typically be used as rhymes."></i>
+                                        </label>
+                                    </div>
+                                    <button id="detect-rhyme-words" class="btn btn-sm btn-primary mb-2">Detect
+                                        Problematic Rhyme Words</button>
+                                    <div id="rhyme-words-list" class="list-group">
+                                        <!-- Rhyme words will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#deleteArtNotesCollapse">
+                                    <i class="fas fa-trash-alt me-2"></i> Remove Art Notes
+                                </button>
+                            </h2>
+                            <div id="deleteArtNotesCollapse" class="accordion-collapse collapse"
+                                data-bs-parent="#featuresAccordion">
+                                <div class="accordion-body">
+                                    <p class="text-muted small mb-3">
+                                        This tool allows you to completely remove all art notes from your manuscript.
+                                        Useful when you need a clean version without any illustrator notes.
+                                    </p>
+                                    <button id="delete-art-notes" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-trash-alt me-2"></i>Delete All Art Notes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Overview -->
+        <!--<div class="row mb-4 mt-3">
+            <div class="col-12">
+                <h3 class="mb-4">Features to Help Picture Book Authors</h3>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card feature-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calculator icon-feature"></i>
+                        <h5 class="card-title">Word Count</h5>
+                        <p class="card-text">Automatically separates your manuscript text from art notes for accurate word counts.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card feature-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-book-reader icon-feature"></i>
+                        <h5 class="card-title">Readability Analysis</h5>
+                        <p class="card-text">Analyze your text's grade level and age appropriateness with Flesch-Kincaid metrics.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card feature-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-cloud icon-feature"></i>
+                        <h5 class="card-title">More cool tools</h5>
+                        <p class="card-text">Generate word clouds, frequency lists, and identify adverbs or problematic rhyming words.</p>
+                    </div>
+                </div>
+            </div>
+        </div>-->
+
+        <!-- Footer -->
+        <footer class="mt-5 pt-4 border-top">
+            <div class="footer-author-container">
+                <h5 class="author-credit">Created by Nathan Christopher</h5>
+                <a href="https://hellonathan.ca/" class="btn btn-sm btn-outline-primary about-btn" target="_blank">
+                    About Me
+                </a>
+            </div>
+
+            <div class="row">
+                <!-- Book Promotion & Learn More Section -->
+                <div class="col-md-6 mb-4">
+                    <div class="row align-items-center">
+                        <div class="col-3 pe-0">
+                            <a href="https://hellonathan.ca/my-books/" target="_blank">
+                                <img src="https://hellonathan.ca/wp-content/uploads/2024/11/9781464225253-2048x2048.jpg"
+                                    class="img-fluid rounded shadow-sm" alt="When Santa Wrote Back!">
+                            </a>
+                        </div>
+                        <div class="col-9 ps-2">
+                            <h6 class="mb-1">My Latest Book: When Santa Wrote Back!</h6>
+                            <p class="mb-1"><small class="text-muted">Coming September 2, 2025!</small></p>
+                            <a href="https://hellonathan.ca/my-books/" class="btn btn-sm btn-outline-primary"
+                                target="_blank">
+                                Preorder Now
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <a href="https://hellonathan.ca/nerdy-stuff-for-authors/pb-author-tools/"
+                            class="text-decoration-none" target="_blank">
+                            Learn about the Google Docs Add-on version of this tool.
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Social Links -->
+                <div class="col-md-6 mb-4">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <a href="https://www.hellonathan.ca" class="text-decoration-none d-block mb-2"
+                                target="_blank">
+                                <i class="fas fa-home me-2"></i> HelloNathan.ca
+                            </a>
+                            <a href="https://twitter.com/HelloNathanC" class="text-decoration-none d-block mb-2"
+                                target="_blank">
+                                <i class="fab fa-twitter me-2"></i> Twitter
+                            </a>
+                            <a href="https://instagram.com/HelloNathanC" class="text-decoration-none d-block mb-2"
+                                target="_blank">
+                                <i class="fab fa-instagram me-2"></i> Instagram
+                            </a>
+                            <a href="https://bsky.app/profile/hellonathanc.bsky.social"
+                                class="text-decoration-none d-block mb-2" target="_blank">
+                                <i class="fas fa-cloud me-2"></i> Bluesky
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="https://discord.com/invite/KSYfkNg" class="text-decoration-none d-block mb-2"
+                                target="_blank">
+                                <i class="fab fa-discord me-2"></i> Discord
+                            </a>
+                            <a href="https://hellonathan.substack.com" class="text-decoration-none d-block mb-2"
+                                target="_blank">
+                                <i class="fas fa-newspaper me-2"></i> Substack
+                            </a>
+                            <a href="https://buymeacoffee.com/hellonathanc" class="text-decoration-none d-block mb-2"
+                                target="_blank">
+                                <i class="fas fa-mug-hot me-2"></i> Buy Me a Coffee
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legal Links and Support -->
+            <div class="row mt-2 pt-3 border-top">
+                <div class="col-12">
+                    <ul class="list-inline small mb-0">
+                        <li class="list-inline-item me-3">
+                            <a href="https://hellonathan.ca/authortools-terms-of-service" target="_blank">Terms of
+                                Service</a>
+                        </li>
+                        <li class="list-inline-item me-3">
+                            <a href="https://hellonathan.ca/authortools-privacy-policy" target="_blank">Privacy
+                                Policy</a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a href="https://hellonathan.ca/authortools-support" target="_blank">Support</a>
+                        </li>
+                        <li class="list-inline-item float-end text-muted">
+                            <small id="site-version">v1.0.0</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Add Modal HTML for Art Note Deletion -->
+    <div class="modal fade" id="noArtNotesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">No Art Notes Found</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-info-circle text-info" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="text-center">No art notes were found in your manuscript.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="text-center" id="confirm-delete-text">Are you sure you want to delete all art notes from
+                        your manuscript? This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete All Art Notes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="successDeleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Success</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-check-circle text-success" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="text-center" id="success-delete-text">Successfully removed art notes from your manuscript.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="password-reset-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reset Your Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="reset-email" class="form-label">Enter your email address</label>
+                        <input type="email" class="form-control" id="reset-email" required>
+                    </div>
+                    <div id="reset-message"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="reset-password-btn">Send Reset Link</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="featureSuggestionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Suggest a Feature</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="feature-suggestion-form">
+                        <div class="mb-3">
+                            <label for="feature-title" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="feature-title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="feature-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="feature-description" rows="4" required></textarea>
+                        </div>
+                        <div id="suggestion-message"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="submit-feature-btn">Submit Suggestion</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add your JavaScript functions here -->
+    <script>
+        // Load scripts
+        document.write(`
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"><\/script>
+            <script src="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.2/dist/quill.min.js"><\/script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.4/d3.min.js"><\/script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.min.js"><\/script>
+            <!-- Firebase SDKs -->
+            <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"><\/script>
+            <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"><\/script>
+            <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"><\/script>
+            <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics-compat.js"><\/script>
+        `);
+
+
+        // Readability Analysis Module
+        class ReadabilityAnalyzer {
+            // Syllable Counting Function
+            static countSyllables(word) {
+                word = word.toLowerCase();
+
+                // exception_add are words that need extra syllables
+                // exception_del are words that need less syllables
+                const exception_add = ['serious', 'crucial'];
+                const exception_del = ['fortunately', 'unfortunately'];
+
+                const co_one = ['cool', 'coach', 'coat', 'coal', 'count', 'coin', 'coarse', 'coup', 'coif', 'cook', 'coign', 'coiffe', 'coof', 'court'];
+                const co_two = ['coapt', 'coed', 'coinci'];
+
+                const pre_one = ['preach'];
+
+                let syls = 0; // added syllable number
+                let disc = 0; // discarded syllable number
+
+                // 1) if letters < 3 : return 1
+                if (word.length <= 3) {
+                    syls = 1;
+                    return syls;
+                }
+
+                // 2) if doesn't end with "ted" or "tes" or "ses" or "ied" or "ies", discard "es" and "ed" at the end.
+                // if it has only 1 vowel or 1 set of consecutive vowels, discard. (like "speed", "fled" etc.)
+                if (word.slice(-2) === "es" || word.slice(-2) === "ed") {
+                    const doubleAndtripple_1 = (word.match(/[eaoui][eaoui]/g) || []).length;
+                    if (doubleAndtripple_1 > 1 || (word.match(/[eaoui][^eaoui]/g) || []).length > 1) {
+                    if (word.slice(-3) === "ted" || word.slice(-3) === "tes" || word.slice(-3) === "ses" || word.slice(-3) === "ied" || word.slice(-3) === "ies") {
+                        // pass
+                    } else {
+                        disc += 1;
+                    }
+                    }
+                }
+
+                // 3) discard trailing "e", except where ending is "le"
+                const le_except = ['whole', 'mobile', 'pole', 'male', 'female', 'hale', 'pale', 'tale', 'sale', 'aisle', 'whale', 'while'];
+
+                if (word.slice(-1) === "e") {
+                    if (word.slice(-2) === "le" && !le_except.includes(word)) {
+                    // pass
+                    } else {
+                    disc += 1;
+                    }
+                }
+
+                // 4) check if consecutive vowels exists, triplets or pairs, count them as one.
+                const doubleAndtripple = (word.match(/[eaoui][eaoui]/g) || []).length;
+                const tripple = (word.match(/[eaoui][eaoui][eaoui]/g) || []).length;
+                disc += doubleAndtripple + tripple;
+
+                // 5) count remaining vowels in word.
+                const numVowels = (word.match(/[eaoui]/g) || []).length;
+
+                // 6) add one if starts with "mc"
+                if (word.slice(0, 2) === "mc") {
+                    syls += 1;
+                }
+
+                // 7) add one if ends with "y" but is not surrounded by vowel
+                if (word.slice(-1) === "y" && !["a", "e", "o", "u", "i"].includes(word.slice(-2, -1))) {
+                    if ((word.slice(-3) === "ely") || (word.slice(-3) === "ety")) {
+                    // Skip adding a syllable for -ly endings
+                    } else {
+                    syls += 1;
+                    }
+                }
+
+                // 8) add one if "y" is surrounded by non-vowels and is not in the last word.
+                for (let i = 0; i < word.length; i++) {
+                    if (word[i] === "y") {
+                    if (i !== 0 && i !== word.length - 1) {
+                        if (!["a", "e", "o", "u", "i"].includes(word[i - 1]) && !["a", "e", "o", "u", "i"].includes(word[i + 1])) {
+                        syls += 1;
+                        }
+                    }
+                    }
+                }
+
+                // 9) if starts with "tri-" or "bi-" and is followed by a vowel, add one.
+                if (word.slice(0, 3) === "tri" && word.length > 3 && ["a", "e", "o", "u", "i"].includes(word[3])) {
+                    syls += 1;
+                }
+
+                if (word.slice(0, 2) === "bi" && word.length > 2 && ["a", "e", "o", "u", "i"].includes(word[2])) {
+                    syls += 1;
+                }
+
+                // 10) if ends with "-ian", should be counted as two syllables, except for "-tian" and "-cian"
+                if (word.slice(-3) === "ian") {
+                    if (word.length > 4 && (word.slice(-4) === "cian" || word.slice(-4) === "tian")) {
+                    // pass
+                    } else {
+                    syls += 1;
+                    }
+                }
+
+                // 11) if starts with "co-" and is followed by a vowel, check if exists in the double syllable dictionary, if not, check if in single dictionary and act accordingly.
+                if (word.slice(0, 2) === "co" && word.length > 2 && ["a", "e", "o", "u", "i"].includes(word[2])) {
+                    if (co_two.includes(word.slice(0, 4)) || co_two.includes(word.slice(0, 5)) || co_two.includes(word.slice(0, 6))) {
+                    syls += 1;
+                    } else if (co_one.includes(word.slice(0, 4)) || co_one.includes(word.slice(0, 5)) || co_one.includes(word.slice(0, 6))) {
+                    // pass
+                    } else {
+                    syls += 1;
+                    }
+                }
+
+                // 12) if starts with "pre-" and is followed by a vowel, check if exists in the double syllable dictionary, if not, check if in single dictionary and act accordingly.
+                if (word.slice(0, 3) === "pre" && word.length > 3 && ["a", "e", "o", "u", "i"].includes(word[3])) {
+                    if (pre_one.includes(word.slice(0, 6))) {
+                    // pass
+                    } else {
+                    syls += 1;
+                    }
+                }
+
+                // 13) check for "-n't" and cross match with dictionary to add syllable.
+                const negative = ["doesn't", "isn't", "shouldn't", "couldn't", "wouldn't"];
+
+                if (word.slice(-3) === "n't") {
+                    if (negative.includes(word)) {
+                    syls += 1;
+                    } else {
+                    // pass
+                    }
+                }
+
+                // 14) Handling the exceptional words.
+                if (exception_del.includes(word)) {
+                    disc += 1;
+                }
+
+                if (exception_add.includes(word)) {
+                    syls += 1;
+                }
+
+                // calculate the output
+                const result = numVowels - disc + syls;
+
+                // Ensure at least 1 syllable for any word
+                return Math.max(1, result);
+                }
+
+            // Analyze Readability
+            static analyze(text) {
+                // Remove art notes and clean text
+                //const cleanText = this.removeArtNotes(text);
+                const cleanText = removeArtNotes(text);
+
+                // Split into sentences and words
+                const sentences = improvedSentenceSplit(cleanText);
+
+                // Add this right after the line that defines 'sentences' in the analyze-readability click handler
+                /*console.log("Total sentences detected:", sentences.length);
+                sentences.forEach((sentence, index) => {
+                    // Trim the sentence and limit its display length to avoid console clutter
+                    const displaySentence = sentence.trim();
+                    const truncatedSentence = displaySentence.length > 100 
+                        ? displaySentence.substring(0, 100) + "..." 
+                        : displaySentence;
+                    
+                    console.log(`Sentence #${index + 1}: "${truncatedSentence}"`);
+                    
+                    // Optional: you can also log the word count for each sentence
+                    //const sentenceWords = sentence.trim().split(/\s+/).filter(word => word.length > 0);
+                    //console.log(`  Words: ${sentenceWords.length}`);
+                });*/
+
+                //const words = this.getWordsFromText(cleanText);
+                const words = getWordsFromText(cleanText);
+
+                // Basic metrics
+                const totalSentences = sentences.length;
+                const totalWords = words.length;
+                const totalSyllables = words.reduce((sum, word) => sum + this.countSyllables(word), 0);
+
+                // Prevent division by zero
+                if (totalSentences === 0 || totalWords === 0) {
+                    return {
+                        totalWords: 0,
+                        totalSentences: 0,
+                        averageWordsPerSentence: 0,
+                        averageSyllablesPerWord: 0,
+                        fleschKincaidGradeLevel: 0,
+                        fleschReadingEase: 0,
+                        complexWordPercentage: 0,
+                        schoolLevel: 'N/A'
+                    };
+                }
+
+                // Calculations
+                const averageWordsPerSentence = totalWords / totalSentences;
+                const averageSyllablesPerWord = totalSyllables / totalWords;
+
+                // Flesch-Kincaid Grade Level Formula
+                const fleschKincaidGradeLevel =
+                    0.39 * (totalWords / totalSentences) +
+                    11.8 * (totalSyllables / totalWords) -
+                    15.59;
+
+                // Flesch Reading Ease Formula
+                const fleschReadingEase =
+                    206.835 -
+                    (1.015 * (totalWords / totalSentences)) -
+                    (84.6 * (totalSyllables / totalWords));
+
+                // Complex word percentage (words with 3+ syllables)
+                const complexWords = words.filter(word => this.countSyllables(word) >= 3);
+                const complexWordPercentage = (complexWords.length / totalWords) * 100;
+
+                // School level based on Flesch Reading Ease
+                let schoolLevel = 'Unknown';
+                if (fleschReadingEase >= 90) schoolLevel = '5th Grade';
+                else if (fleschReadingEase >= 80) schoolLevel = '6th Grade';
+                else if (fleschReadingEase >= 70) schoolLevel = '7th Grade';
+                else if (fleschReadingEase >= 60) schoolLevel = '8-9th Grade';
+                else if (fleschReadingEase >= 50) schoolLevel = '10-12th Grade';
+                else if (fleschReadingEase >= 30) schoolLevel = 'College';
+                else schoolLevel = 'College Graduate';
+
+                return {
+                    totalWords,
+                    totalSentences,
+                    averageWordsPerSentence: averageWordsPerSentence.toFixed(1),
+                    averageSyllablesPerWord: averageSyllablesPerWord.toFixed(1),
+                    fleschKincaidGradeLevel: fleschKincaidGradeLevel.toFixed(1),
+                    fleschReadingEase: fleschReadingEase.toFixed(1),
+                    complexWordPercentage: complexWordPercentage.toFixed(1),
+                    schoolLevel
+                };
+            }
+        }
+
+        // Debounce function to limit how often a function is called
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), wait);
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // For site version tracking in the footer
+            const versionElement = document.getElementById('site-version');
+            if (window.SITE_VERSION) {
+                versionElement.textContent = `v${window.SITE_VERSION.version} (${window.SITE_VERSION.buildDate})`;
+            }
+
+            // Variables for tracking mouse down/up text selection
+            let isSelectingText = false;
+            let selectionTimeout = null;
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyDjl1-5F3IJ38TZZCK4IiW7PiapdEkTmI4",
+                authDomain: "pb-author-tools-542ca.firebaseapp.com",
+                projectId: "pb-author-tools-542ca",
+                storageBucket: "pb-author-tools-542ca.firebasestorage.app",
+                messagingSenderId: "847283609320",
+                appId: "1:847283609320:web:0349f755d64e89b277335d",
+                measurementId: "G-6P7RCTZ8NX"
+            };
+
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+
+            // Initialize Google Analytics with Firebase
+            firebase.analytics();
+
+            // Initialize auth buttons (sign in/sign out)
+            addLogoutButton();
+
+            // Set up the readability analysis feature
+            document.getElementById('analyze-readability').addEventListener('click', function () {
+                // Get text from the editor (excluding art notes)
+                const text = getPlainTextFromEditor();
+
+                // Show the results container
+                const resultsContainer = document.getElementById('readability-results');
+                resultsContainer.style.display = 'block';
+
+                // Run the analysis
+                const results = ReadabilityAnalyzer.analyze(text);
+
+                // Update the UI with the results
+                document.getElementById('word-count').textContent = results.totalWords;
+                document.getElementById('sentence-count').textContent = results.totalSentences;
+                document.getElementById('avg-words-per-sentence').textContent = results.averageWordsPerSentence;
+                document.getElementById('avg-syllables-per-word').textContent = results.averageSyllablesPerWord;
+                document.getElementById('flesch-kincaid-grade').textContent = results.fleschKincaidGradeLevel;
+                document.getElementById('flesch-reading-ease').textContent = results.fleschReadingEase;
+                document.getElementById('complex-word-percentage').textContent = results.complexWordPercentage + '%';
+                document.getElementById('school-level').textContent = results.schoolLevel;
+
+                // Add helpful context based on the results
+                const gradeLevel = parseFloat(results.fleschKincaidGradeLevel);
+                const readingEase = parseFloat(results.fleschReadingEase);
+
+                // Add color coding based on grade level appropriateness for picture books
+                const gradeElement = document.getElementById('flesch-kincaid-grade');
+                if (gradeLevel <= 3) {
+                    gradeElement.style.color = '#28a745'; // Green - appropriate for picture books
+                } else if (gradeLevel <= 4.5) {
+                    gradeElement.style.color = '#fd7e14'; // Orange - might be challenging
+                } else {
+                    gradeElement.style.color = '#dc3545'; // Red - likely too complex
+                }
+
+                // Add color coding for reading ease
+                const easeElement = document.getElementById('flesch-reading-ease');
+                if (readingEase >= 80) {
+                    easeElement.style.color = '#28a745'; // Green - very easy to read
+                } else if (readingEase >= 60) {
+                    easeElement.style.color = '#fd7e14'; // Orange - moderately easy
+                } else {
+                    easeElement.style.color = '#dc3545'; // Red - difficult
+                }
+
+                // Initialize tooltips after updating readability results
+                document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+                    new bootstrap.Tooltip(el);
+                });
+            });
+
+            // Initialize Quill editor
+            const quill = new Quill('#editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'align': [] }],
+                        ['clean']
+                    ],
+                    clipboard: {},  
+                    keyboard: {
+                        bindings: {
+                            'enter': {
+                                key: 13,
+                                handler: function (range) {
+                                    // Only add one newline at a time
+                                    quill.insertText(range.index, '\n');
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                },
+                placeholder: 'Paste your manuscript here...'
+            });
+
+            // Set up the custom paste handler
+            setupCustomQuillPasteHandler(quill);
+
+            // Setup function to detect when text selection is happening to prevent the art formatting
+            // from interrupting the user's selection
+            setupSelectionDetection(quill);
+
+            // Feature suggestion modal handling
+            document.getElementById('suggest-feature-btn')?.addEventListener('click', function () {
+                const featureModal = new bootstrap.Modal(document.getElementById('featureSuggestionModal'));
+                featureModal.show();
+            });
+
+            // Feature suggestion submission
+            document.getElementById('submit-feature-btn')?.addEventListener('click', function () {
+                const featureTitle = document.getElementById('feature-title').value;
+                const featureDescription = document.getElementById('feature-description').value;
+
+                if (!featureTitle || !featureDescription) {
+                    document.getElementById('suggestion-message').innerHTML = `
+                        <div class="alert alert-danger">Please fill in all fields.</div>
+                    `;
+                    return;
+                }
+
+                // Show loading state
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+
+                // Get current user
+                const user = firebase.auth().currentUser;
+
+                // Create the suggestion document
+                firebase.firestore().collection('feature_suggestions').add({
+                    title: featureTitle,
+                    description: featureDescription,
+                    userEmail: user ? user.email : 'Anonymous',
+                    userId: user ? user.uid : null,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'new',
+                    viewed: false
+                })
+                    .then(() => {
+                        // Show success message
+                        document.getElementById('suggestion-message').innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Thank you for your suggestion! We'll review it soon.
+                        </div>
+                    `;
+
+                        // Clear form
+                        document.getElementById('feature-title').value = '';
+                        document.getElementById('feature-description').value = '';
+
+                        // Reset button after short delay
+                        setTimeout(() => {
+                            this.disabled = false;
+                            this.innerHTML = 'Submit Suggestion';
+
+                            // Close modal after showing success message
+                            setTimeout(() => {
+                                const modal = bootstrap.Modal.getInstance(document.getElementById('featureSuggestionModal'));
+                                modal.hide();
+                            }, 550);
+                        }, 500);
+                    })
+                    .catch((error) => {
+                        console.error('Error submitting suggestion:', error);
+
+                        // Show error message
+                        document.getElementById('suggestion-message').innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Something went wrong. Please try again.
+                        </div>
+                    `;
+
+                        // Reset button
+                        this.disabled = false;
+                        this.innerHTML = 'Submit Suggestion';
+                    });
+            });
+
+            // Art note detection regex patterns
+            // These patterns detect art notes, including those that span multiple lines
+            const bracketArtNoteRegex = /\[([\s\S]*?)\]/g;
+            const parenArtNoteRegex = /\((?:[\s\S]*?art note[\s\S]*?|[\s\S]*?art:[\s\S]*?|[\s\S]*?illus[\s\S]*?|[\s\S]*?illo[\s\S]*?|[\s\S]*?illustration note[\s\S]*?|[\s\S]*?action note[\s\S]*?)\)/gi;
+
+            // Lists of special words for detection
+            const adverbList = [
+                "abnormally", "abruptly", "absently", "absentmindedly", "absolutely", "accusingly", "actually",
+                "adorably", "amazingly", "angrily", "annoyingly", "anxiously", "arrogantly", "awfully",
+                "awkwardly", "badly", "bashfully", "beautifully", "bitterly", "bleakly", "blissfully",
+                "boastfully", "boldly", "bossily", "bravely", "breathlessly", "brilliantly", "brightly",
+                "calmly", "carefully", "carelessly", "cautiously", "certainly", "cheerfully", "cheekily",
+                "childishly", "clearly", "cleverly", "closely", "coaxingly", "colorfully", "completely",
+                "coolly", "courageously", "crazily", "crossly", "cruelly", "curiously", "daintily",
+                "daringly", "dazzlingly", "deceivingly", "deeply", "defiantly", "definitely", "delightfully",
+                "demandingly", "depressingly", "desperately", "determinedly", "diligently", "disappointingly",
+                "disgustingly", "distressingly", "doubtfully", "dramatically", "dreamily", "drowsily", "dully",
+                "eagerly", "easily", "ecstatically", "effortlessly", "elegantly", "embarrassingly", "emotionally",
+                "energetically", "enormously", "enthusiastically", "entirely", "enviously", "exactly",
+                "excessively", "exceptionally", "excitedly", "exhaustingly", "expressively", "extremely",
+                "faithfully", "fantastically", "fearfully", "ferociously", "fervently", "fiercely", "flamboyantly",
+                "flatly", "fondly", "foolishly", "forcefully", "forgetfully", "frankly", "frantically", "freely",
+                "frenetically", "frenziedly", "frightfully", "frustratingly", "funnily", "furiously", "furtively",
+                "generously", "gently", "giggly", "gingerly", "gladly", "gleefully", "gloomily", "goofily",
+                "gracefully", "graciously", "grandly", "gratefully", "greedily", "grouchily", "grumpily",
+                "haphazardly", "happily", "harshly", "hastily", "heartily", "heavily", "helpfully", "helplessly",
+                "hesitatingly", "hilariously", "highly", "honestly", "hopelessly", "horribly", "hugely",
+                "humorously", "hungrily", "hurriedly", "hysterically", "ignorantly", "immensely", "impatiently",
+                "impressively", "impulsively", "incredibly", "indignantly", "infuriatingly", "innocently",
+                "inquisitively", "insanely", "insistently", "instantly", "intensely", "intently", "interestingly",
+                "inwardly", "irritably", "irritatingly", "jaggedly", "jealously", "jokingly", "jovially",
+                "joyfully", "joylessly", "joyously", "jubilantly", "judgmentally", "jumpily", "justly", "keenly",
+                "kiddingly", "kindheartedly", "kindly", "knavishly", "knowingly", "knowledgeably", "kookily",
+                "lazily", "lightly", "limply", "listlessly", "lively", "loftily", "longingly", "loosely",
+                "loudly", "lovably", "lovingly", "loyally", "madly", "magically", "majestically", "marvelously",
+                "meaningfully", "mechanically", "menacingly", "merrily", "messily", "mightily", "miserably",
+                "mockingly", "moodily", "mortally", "mysteriously", "nastily", "naturally", "naughtily",
+                "neatly", "nervously", "nicely", "noisily", "noticeably", "obediently", "obnoxiously",
+                "oddly", "offensively", "optimistically", "outrageously", "overconfidently", "painfully",
+                "passionately", "patiently", "peculiarly", "perfectly", "persistently", "persuasively",
+                "petulantly", "physically", "piteously", "pitifully", "playfully", "pleasantly", "politely",
+                "poorly", "positively", "possessively", "potentially", "poutingly", "powerfully", "preciously",
+                "precisely", "profusely", "promptly", "properly", "protectively", "proudly", "punctually",
+                "puzzlingly", "quaintly", "queasily", "questionably", "queerly", "quicker", "quickly", "quietly",
+                "quirkily", "quirky", "quizzically", "ragingly", "randomly", "rapidly", "rashly", "ravenously",
+                "readily", "reassuringly", "recklessly", "regularly", "reluctantly", "remarkably", "repeatedly",
+                "reproachfully", "resentfully", "restfully", "restlessly", "righteously", "rightfully",
+                "ridiculously", "rigidly", "roughly", "rudely", "sadly", "safely", "sarcastically", "sassily",
+                "savagely", "scarcely", "scaredly", "scarily", "scornfully", "searchingly", "secretively",
+                "sedately", "seemingly", "seldom", "selfishly", "separately", "seriously", "shakily", "sharply",
+                "sheepishly", "shockingly", "shrilly", "shyly", "significantly", "silently", "simply", "sincerely",
+                "sleepily", "slightly", "sloppily", "sluggishly", "slyly", "slowly", "smoothly", "sneakily",
+                "softly", "solemnly", "solidly", "sourly", "speedily", "splendidly", "squeakily", "stealthily",
+                "sternly", "stiffly", "strangely", "strictly", "strongly", "stubbornly", "stunningly", "stupidly",
+                "subtly", "successfully", "suddenly", "sulkily", "super", "supposedly", "surprisingly",
+                "suspiciously", "sweetly", "swiftly", "sympathetically", "tantalizingly", "teasingly", "tenderly",
+                "tensely", "terribly", "terrifically", "thoughtfully", "thoughtlessly", "thrillingly", "tightly",
+                "timidly", "tiredly", "tremendously", "triumphantly", "truly", "truthfully", "unabashedly",
+                "unaccountably", "unbearably", "uncomfortably", "understandably", "understandingly", "uneasily",
+                "unethically", "unexpectedly", "unfortunately", "unhappily", "unimpressively", "unnaturally",
+                "unnecessarily", "unquestionably", "unusually", "unwillingly", "urgently", "uselessly", "usually",
+                "utterly", "vacantly", "vaguely", "vainly", "valiantly", "vastly", "vehemently", "verbally",
+                "viciously", "victoriously", "vigorously", "violently", "visibly", "vivaciously", "voluntarily",
+                "warmly", "weakly", "wearily", "wetly", "wholeheartedly", "wholly", "wildly", "willfully",
+                "willingly", "wisely", "wobbly", "woefully", "wonderfully", "worriedly", "wrongly", "yawningly",
+                "yearly", "yearningly", "yieldingly", "youthfully", "zealously", "zestfully", "zestily"
+            ];
+
+            const problematicRhymeWords = ["actually", "adult", "advertisement", "again", "apricot", "aunt", "buyer", "camera", "caramel", "caribbean", "chocolate", "choir", "comfortable", "crayon", "cyan", "data", "different", "drawer", "either", "envelope", "everything", "every", "extraordinary", "family", "favorite", "file", "finally", "fire", "fired", "flower", "genuine", "glorious", "gnarled", "grocery", "hour", "idea", "into", "interesting", "iron", "laboratory", "layer", "liar", "library", "loyal", "mature", "mayonnaise", "mirror", "mischievous", "neither", "oil", "orange", "our", "pecan", "pile", "poem", "power", "probably", "rather", "real", "restaurant", "roof", "route", "royal", "scone", "school", "schools", "schoolhouse", "separate", "shower", "sizzling", "smile", "squirrel", "steal", "steel", "style", "sure", "theatre", "theater", "tire", "tired", "toward", "vase", "while", "wild"];
+
+            // Stop words for word cloud and frequency
+            const stopWords = [
+                "a", "able", "about", "across", "after", "all", "almost", "also", "am", "among", "an",
+                "and", "any", "are", "as", "at", "be", "because", "been", "but", "by", "can", "cannot",
+                "could", "did", "do", "does", "either", "else", "ever", "every", "for", "from", "get",
+                "got", "had", "has", "have", "he", "her", "hers", "him", "his", "how", "however", "i",
+                "if", "in", "into", "is", "it", "its", "just", "least", "let", "like", "likely", "may",
+                "me", "might", "most", "must", "my", "neither", "no", "nor", "not", "of", "off", "often",
+                "on", "only", "or", "other", "our", "own", "rather", "said", "say", "says", "she", "should",
+                "since", "so", "some", "than", "that", "the", "their", "them", "then", "there", "these",
+                "they", "this", "tis", "to", "too", "twas", "us", "wants", "was", "we", "were", "what",
+                "when", "where", "which", "while", "who", "whom", "why", "will", "with", "would", "yet",
+                "you", "your", "illo", "illus"
+            ];
+
+            // Function to show editor section
+            function showEditorSection(email) {
+                console.log("Showing editor section for", email);
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('editor-section').style.display = 'block';
+
+                // Add logout button
+                addLogoutButton();
+
+                // Smoothly scroll to the top of the page
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+
+            // Check if user is already logged in
+            firebase.auth().onAuthStateChanged(function (user) {
+                if (user) {
+                    // User is signed in
+                    console.log("User signed in:", user.email);
+                    showEditorSection(user.email);
+
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'login_success', {
+                            'user_id': user.uid, // GA automatically hashes this for privacy
+                            'login_method': user.providerData[0]?.providerId || 'unknown'
+                        });
+                    }
+
+                    // Check or create user document in Firestore
+                    const userRef = firebase.firestore().collection('users').doc(user.uid);
+                    userRef.get().then((doc) => {
+                        if (!doc.exists) {
+                            // Create new user document
+                            userRef.set({
+                                email: user.email,
+                                signup_date: firebase.firestore.FieldValue.serverTimestamp(),
+                            });
+                        }
+                    });
+                } else {
+                    // No user is signed in
+                    console.log("No user signed in");
+                    document.getElementById('login-section').style.display = 'block';
+                    document.getElementById('editor-section').style.display = 'none';
+                }
+            });
+
+            // Word cloud generation
+            document.getElementById('generate-word-cloud').addEventListener('click', function () {
+                const text = getPlainTextFromEditor();
+                const wordFrequencies = getWordFrequencies(text);
+                generateWordCloud(wordFrequencies, 'word-cloud-container');
+            });
+
+            // Word frequency list
+            document.getElementById('generate-word-freq').addEventListener('click', function () {
+                const text = getPlainTextFromEditor();
+                const wordFrequencies = getWordFrequencies(text);
+                displayWordFrequencies(wordFrequencies);
+            });
+
+            // Adverb detection
+            document.getElementById('detect-adverbs').addEventListener('click', function () {
+                const text = getPlainTextFromEditor();
+                const adverbsFound = detectSpecialWords(text, adverbList);
+                displaySpecialWordsList(adverbsFound, 'adverbs-list', 'Adverbs');
+            });
+
+            // Problematic rhyme words detection
+            document.getElementById('detect-rhyme-words').addEventListener('click', function () {
+                const text = getPlainTextFromEditor();
+                const onlyLineEndings = document.getElementById('only-line-endings').checked;
+
+                if (onlyLineEndings) {
+                    // Filter for problematic rhyme words at line/sentence endings
+                    const rhymeWordsFound = detectRhymeWordsAtEndings(text, problematicRhymeWords);
+                    displaySpecialWordsList(rhymeWordsFound, 'rhyme-words-list', 'Problematic rhyme words at line/sentence endings');
+                } else {
+                    // Original function for finding anywhere in text
+                    const rhymeWordsFound = detectSpecialWords(text, problematicRhymeWords);
+                    displaySpecialWordsList(rhymeWordsFound, 'rhyme-words-list', 'Problematic rhyme words');
+                }
+            });
+
+            // New function to detect rhyme words specifically at line or sentence endings
+            function detectRhymeWordsAtEndings(text, wordList) {
+                // Remove art notes from the text first
+                const textWithoutArtNotes = removeArtNotes(text);
+
+                // Split text into lines
+                const lines = textWithoutArtNotes.split(/\r?\n/).filter(line => line.trim() !== '');
+
+                // Track problematic words and their positions
+                const problematicWords = {};
+
+                // Check each problematic word
+                wordList.forEach(targetWord => {
+                    let totalCount = 0;
+
+                    // Check for line endings
+                    lines.forEach(line => {
+                        const lastWord = getLastWord(line);
+                        if (lastWord && lastWord.toLowerCase() === targetWord.toLowerCase()) {
+                            // Found the word at a line ending
+                            totalCount++;
+                        }
+                    });
+
+                    // Check for sentence endings that aren't also line endings
+                    const sentenceRegex = new RegExp(`[^.!?]+\\b${targetWord}\\b[.!?]+`, 'gi');
+                    let match;
+
+                    while ((match = sentenceRegex.exec(textWithoutArtNotes)) !== null) {
+                        const sentence = match[0];
+                        // Check if this is a sentence that doesn't end a line
+                        const isAlsoLineEnding = lines.some(line =>
+                            line.toLowerCase().includes(targetWord.toLowerCase()) &&
+                            (line.endsWith(targetWord) ||
+                                line.endsWith(targetWord + '.') ||
+                                line.endsWith(targetWord + '!') ||
+                                line.endsWith(targetWord + '?') ||
+                                line.endsWith(targetWord + ','))
+                        );
+
+                        if (!isAlsoLineEnding) {
+                            totalCount++;
+                        }
+                    }
+
+                    if (totalCount > 0) {
+                        problematicWords[targetWord] = totalCount;
+                    }
+                });
+
+                // Convert to array and sort by frequency
+                return Object.entries(problematicWords)
+                    .map(([word, count]) => ({ word: word, count: count }))
+                    .sort((a, b) => b.count - a.count);
+            }
+
+            // Helper function to get the last word of a string
+            function getLastWord(text) {
+                if (!text) return null;
+
+                // Remove punctuation at the very end
+                const cleanText = text.trim().replace(/[.,!?;:"']+$/, '');
+
+                // Get the last word
+                const words = cleanText.split(/\s+/);
+                return words[words.length - 1];
+            }
+
+            // Initialize all tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Process content changes with debouncing for better performance
+            const processContentChanges = debounce(function () {
+                // Only update formatting if user is not currently selecting text
+                if (!isSelectingText) {
+                    updateWordCounts();
+                    highlightArtNotes();
+                } 
+            }, 450);
+
+            // Monitor quill content changes
+            quill.on('text-change', processContentChanges);
+
+            // Paste handler
+            quill.root.addEventListener('paste', function (e) {
+                // Allow a little time for Quill to handle the paste
+                setTimeout(function () {
+                    processContentChanges();
+                }, 100);
+            });
+
+            // Initial processing
+            setTimeout(function () {
+                updateWordCounts();
+            }, 100);
+
+            function getPlainTextFromEditor() {
+                // Get text directly from Quill
+                return quill.getText().trim();
+            }
+
+            function getWordFrequencies(text) {
+                const words = getWordsFromText(text);
+                if (words.length === 0) {
+                    return [];
+                }
+
+                const freqMap = {};
+
+                // Filter out art notes and stop words
+                const cleanText = removeArtNotes(text);
+                const filteredWords = getWordsFromText(cleanText)
+                    .filter(word => !stopWords.includes(word) && word.length > 1);
+
+                // Count word frequencies
+                filteredWords.forEach(word => {
+                    if (freqMap[word]) {
+                        freqMap[word]++;
+                    } else {
+                        freqMap[word] = 1;
+                    }
+                });
+
+                // Convert to array and sort by frequency
+                const sortedFreq = Object.entries(freqMap)
+                    .map(([word, count]) => ({ text: word, size: count }))
+                    .sort((a, b) => b.size - a.size)
+                    .slice(0, 100); // Limit to top 100 words
+
+                return sortedFreq;
+            }
+
+            function detectSpecialWords(text, wordList) {
+                // Remove art notes from the text first
+                const textWithoutArtNotes = removeArtNotes(text);
+
+                // Get words from the text without art notes
+                const words = getWordsFromText(textWithoutArtNotes);
+
+                // Find words from the provided list in the text
+                const specialWordsFound = {};
+
+                words.forEach(word => {
+                    if (wordList.includes(word)) {
+                        if (specialWordsFound[word]) {
+                            specialWordsFound[word]++;
+                        } else {
+                            specialWordsFound[word] = 1;
+                        }
+                    }
+                });
+
+                // Convert to array and sort by frequency
+                return Object.entries(specialWordsFound)
+                    .map(([word, count]) => ({ word: word, count: count }))
+                    .sort((a, b) => b.count - a.count);
+            }
+
+            // First, let's update the displaySpecialWordsList function to add the clickable behavior
+            function displaySpecialWordsList(wordsList, elementId, title) {
+                const container = document.getElementById(elementId);
+                container.innerHTML = '';
+
+                if (wordsList.length === 0) {
+                    container.innerHTML = `<div class="alert alert-info">No ${title.toLowerCase()} found in your text.</div>`;
+                    return;
+                }
+
+                wordsList.forEach(item => {
+                    const listItem = document.createElement('div');
+                    listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    listItem.style.cursor = 'pointer'; // Add cursor pointer
+                    listItem.innerHTML = `
+                        <span>${capitalizeFirstLetter(item.word)}</span>
+                        <span class="badge bg-primary rounded-pill">${item.count}</span>
+                    `;
+                    // Add hover effect
+                    listItem.addEventListener('mouseover', () => {
+                        listItem.style.backgroundColor = '#f8f9fa';
+                    });
+                    listItem.addEventListener('mouseout', () => {
+                        listItem.style.backgroundColor = '';
+                    });
+                    // Add click event for word highlighting
+                    listItem.addEventListener('click', () => {
+                        highlightWordInstances(item.word);
+                    });
+                    container.appendChild(listItem);
+                });
+            }
+
+            function capitalizeFirstLetter(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+
+            function displayWordFrequencies(wordFrequencies) {
+                const container = document.getElementById('word-freq-list');
+                container.innerHTML = '';
+
+                if (wordFrequencies.length === 0) {
+                    container.innerHTML = '<div class="alert alert-info">No significant words found in your text.</div>';
+                    return;
+                }
+
+                wordFrequencies.slice(0, 30).forEach(item => { // Show top 30
+                    const listItem = document.createElement('div');
+                    listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    listItem.style.cursor = 'pointer'; // Add cursor pointer
+                    listItem.innerHTML = `
+                        <span>${capitalizeFirstLetter(item.text)}</span>
+                        <span class="badge bg-primary rounded-pill">${item.size}</span>
+                    `;
+                    // Add hover effect
+                    listItem.addEventListener('mouseover', () => {
+                        listItem.style.backgroundColor = '#f8f9fa';
+                    });
+                    listItem.addEventListener('mouseout', () => {
+                        listItem.style.backgroundColor = '';
+                    });
+                    // Add click event for word highlighting
+                    listItem.addEventListener('click', () => {
+                        highlightWordInstances(item.text);
+                    });
+                    container.appendChild(listItem);
+                });
+            }
+
+            // Add this variable outside of any function to track currently highlighted word
+            let currentHighlightedWord = null;
+
+            // Add this function to highlight word instances in the editor
+            function highlightWordInstances(word) {
+                // Clear previous highlights if different word
+                if (currentHighlightedWord !== word) {
+                    clearWordHighlights();
+                }
+
+                currentHighlightedWord = word;
+
+                // Get the text content
+                const text = quill.getText();
+
+                // Create a regex to find all instances of the word with word boundaries
+                const wordRegex = new RegExp(`\\b${word}\\b`, 'gi');
+
+                let match;
+                // Reset lastIndex
+                wordRegex.lastIndex = 0;
+
+                // Find and highlight all instances
+                while ((match = wordRegex.exec(text)) !== null) {
+                    quill.formatText(match.index, match[0].length, {
+                        'background': 'yellow'
+                    });
+                }
+
+                // Preserve art note formatting
+                highlightArtNotes();
+            }
+
+            // Add this function to clear word highlights
+            function clearWordHighlights() {
+                if (!currentHighlightedWord) return;
+
+                // Get the full text length
+                const text = quill.getText();
+
+                // Remove all yellow background formatting at once instead of iterating through Delta ops
+                quill.formatText(0, text.length, {
+                    'background': false
+                });
+
+                currentHighlightedWord = null;
+
+                // Re-apply art note highlighting
+                highlightArtNotes();
+            }
+
+            function generateWordCloud(words, containerId) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+
+                if (words.length === 0) {
+                    container.innerHTML = '<div class="alert alert-info">Not enough text to generate a word cloud.</div>';
+                    return;
+                }
+
+                const width = container.offsetWidth;
+                const height = container.offsetHeight;
+
+                // Scale word sizes for better visual appearance
+                const maxSize = words[0].size;
+                const minSize = words[words.length - 1].size;
+                const fontSizeScale = d3.scaleLinear()
+                    .domain([minSize, maxSize])
+                    .range([14, 50]);
+
+                words.forEach(d => {
+                    d.size = fontSizeScale(d.size);
+                });
+
+                // Generate cloud layout
+                d3.layout.cloud()
+                    .size([width, height])
+                    .words(words)
+                    .padding(5)
+                    .rotate(() => ~~(Math.random() * 2) * 90)
+                    .font("Impact")
+                    .fontSize(d => d.size)
+                    .on("end", drawWordCloud)
+                    .start();
+
+                function drawWordCloud(words) {
+                    // Create SVG
+                    const svg = d3.select(`#${containerId}`).append("svg")
+                        .attr("width", width)
+                        .attr("height", height)
+                        .append("g")
+                        .attr("transform", `translate(${width / 2},${height / 2})`);
+
+                    // Add words
+                    svg.selectAll("text")
+                        .data(words)
+                        .enter().append("text")
+                        .style("font-size", d => `${d.size}px`)
+                        .style("font-family", "Impact")
+                        .style("fill", () => d3.schemeCategory10[Math.floor(Math.random() * 10)])
+                        .style("cursor", "pointer") // Add cursor pointer
+                        .attr("text-anchor", "middle")
+                        .attr("transform", d => `translate(${d.x},${d.y}) rotate(${d.rotate})`)
+                        .text(d => d.text)
+                        .on("click", (event, d) => { // Add click event handler
+                            highlightWordInstances(d.text);
+                        });
+                }
+            }
+
+            function updateWordCounts() {
+                // Get text content
+                const text = getPlainTextFromEditor();
+
+                // Handle empty editor case
+                if (!text || text.trim() === '') {
+                    document.getElementById('text-word-count').textContent = '0';
+                    document.getElementById('art-notes-word-count').textContent = '0';
+                    document.getElementById('total-word-count').textContent = '0';
+                    document.getElementById('art-notes-count').textContent = '0';
+                    return;
+                }
+
+                // Define counters
+                let textWordCount = 0;
+                let artNotesWordCount = 0;
+                let totalWordCount = 0;
+
+                // Find all art notes using improved function
+                const artNotes = findArtNotes(text);
+                const artNotesCount = artNotes.length;
+
+                // Count words in art notes
+                artNotes.forEach(note => {
+                    const artNoteWords = getWordsFromText(note.text);
+                    artNotesWordCount += artNoteWords.length;
+                });
+
+                // Count words in text without art notes
+                const textWithoutArtNotes = removeArtNotes(text);
+                const textWords = getWordsFromText(textWithoutArtNotes);
+                textWordCount = textWords.length;
+
+                // Calculate total
+                totalWordCount = textWordCount + artNotesWordCount;
+
+                // Update statistics display
+                document.getElementById('text-word-count').textContent = textWordCount;
+                document.getElementById('art-notes-word-count').textContent = artNotesWordCount;
+                document.getElementById('total-word-count').textContent = totalWordCount;
+                document.getElementById('art-notes-count').textContent = artNotesCount;
+
+                // Apply highlighting
+                highlightArtNotes();
+            }
+
+            /*function highlightArtNotes() {
+                // Get the text to search for art notes
+                const text = quill.getText();
+                
+                // Find art notes using improved function
+                const artNotes = findArtNotes(text);
+                
+                // We'll need to save any yellow background formatting first
+                let yellowHighlights = [];
+                if (currentHighlightedWord) {
+                    // Find all instances of the currently highlighted word
+                    const wordRegex = new RegExp(`\\b${currentHighlightedWord}\\b`, 'gi');
+                    let match;
+                    wordRegex.lastIndex = 0;
+                    
+                    while ((match = wordRegex.exec(text)) !== null) {
+                        yellowHighlights.push({
+                            index: match.index,
+                            length: match[0].length
+                        });
+                    }
+                }
+                
+                // Apply formatting to art notes
+                artNotes.forEach(note => {
+                    // Calculate length (end - start is the index difference, but we need length)
+                    const length = note.end - note.start + 1;
+                    
+                    try {
+                        quill.formatText(note.start, length, {
+                            'color': '#d9534f',
+                            'italic': true,
+                            'background': 'rgba(217, 83, 79, 0.1)'
+                        });
+                    } catch (e) {
+                        console.error('Error formatting art note:', e);
+                    }
+                });
+                
+                // Re-apply yellow highlights for words
+                yellowHighlights.forEach(highlight => {
+                    quill.formatText(highlight.index, highlight.length, {
+                        'background': 'yellow'
+                    });
+                });
+            }*/
+
+            function highlightArtNotes() {
+                // Get the text to search for art notes
+                const text = quill.getText();
+
+                // We'll need to save any yellow background formatting first (for word highlighting)
+                let yellowHighlights = [];
+                if (currentHighlightedWord) {
+                    // Find all instances of the currently highlighted word
+                    const wordRegex = new RegExp(`\\b${currentHighlightedWord}\\b`, 'gi');
+                    let match;
+                    wordRegex.lastIndex = 0;
+
+                    while ((match = wordRegex.exec(text)) !== null) {
+                        yellowHighlights.push({
+                            index: match.index,
+                            length: match[0].length
+                        });
+                    }
+                }
+
+                // Clear all existing art note formatting but preserve any other formatting
+                // This ensures text that was previously an art note but isn't anymore loses its formatting
+                quill.formatText(0, text.length, {
+                    'color': false,
+                    'italic': false,
+                    'background': false
+                });
+
+                // Find art notes using improved function
+                const artNotes = findArtNotes(text);
+
+                // Re-apply formatting to art notes that still exist
+                artNotes.forEach(note => {
+                    // Calculate length (end - start is the index difference, but we need length)
+                    const length = note.end - note.start + 1;
+
+                    try {
+                        quill.formatText(note.start, length, {
+                            'color': '#d9534f',
+                            'italic': true,
+                            'background': 'rgba(217, 83, 79, 0.1)'
+                        });
+                    } catch (e) {
+                        console.error('Error formatting art note:', e);
+                    }
+                });
+
+                // Re-apply yellow highlights for words
+                yellowHighlights.forEach(highlight => {
+                    quill.formatText(highlight.index, highlight.length, {
+                        'background': 'yellow'
+                    });
+                });
+            }
+
+
+
+            //});
+
+            //document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Firebase Authentication
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+
+            // Email/Password Login
+            document.getElementById('login-form')?.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+
+                // Clear previous error messages
+                document.getElementById('login-message').innerHTML = '';
+                document.getElementById('signup-message').innerHTML = '';
+
+                // Show loading state
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Logging in...';
+
+                // Sign in with email and password
+                auth.signInWithEmailAndPassword(email, password)
+                    .catch((error) => {
+                        // Handle errors
+                        let errorMessage = 'Login failed. Please check your email and password.';
+                        if (error.code === 'auth/user-not-found') {
+                            errorMessage = 'No account found with this email. Please sign up.';
+                        } else if (error.code === 'auth/wrong-password') {
+                            errorMessage = 'Incorrect password. Please try again or reset your password.';
+                        }
+
+                        /*document.getElementById('auth-message').innerHTML = `
+                        <div class="alert alert-danger">${errorMessage}</div>
+                        `;*/
+                        document.getElementById('login-message').innerHTML = `
+                <div class="alert alert-danger">${errorMessage}</div>
+                `;
+
+                        // Reset button
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalBtnText;
+                    });
+            });
+
+            // Email/Password Signup
+            document.getElementById('signup-form')?.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+                const confirmPassword = document.getElementById('signup-confirm-password').value;
+
+                // Clear previous error messages
+                document.getElementById('signup-message').innerHTML = '';
+
+                // Check if passwords match
+                if (password !== confirmPassword) {
+                    document.getElementById('signup-message').innerHTML = `
+                <div class="alert alert-danger">Passwords do not match. Please try again.</div>
+                `;
+                    return;
+                }
+
+                // Show loading state
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating account...';
+
+                // Create user with email and password
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        // Store user in database with newsletter preference
+                        db.collection('users').doc(userCredential.user.uid).set({
+                            email: email,
+                            signup_date: firebase.firestore.FieldValue.serverTimestamp(),
+                            auth_method: 'email'
+                        });
+
+                        // Reset the form immediately after successful account creation
+                        document.getElementById('signup-form').reset();
+                    })
+                    .catch((error) => {
+                        // Handle errors
+                        let errorMessage = 'Sign up failed. Please try again.';
+                        if (error.code === 'auth/email-already-in-use') {
+                            errorMessage = 'An account already exists with this email. Please log in instead.';
+                        } else if (error.code === 'auth/weak-password') {
+                            errorMessage = 'Password is too weak. Please use at least 6 characters.';
+                        }
+
+                        /*document.getElementById('auth-message').innerHTML = `
+                        <div class="alert alert-danger">${errorMessage}</div>
+                        `;*/
+                        document.getElementById('signup-message').innerHTML = `
+                <div class="alert alert-danger">${errorMessage}</div>
+                `;
+
+                        // Reset button
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalBtnText;
+                    });
+            });
+
+            // Google Authentication
+            document.getElementById('google-login-btn')?.addEventListener('click', function () {
+                // Clear any existing error messages
+                document.getElementById('login-message').innerHTML = '';
+                document.getElementById('signup-message').innerHTML = '';
+                
+                const provider = new firebase.auth.GoogleAuthProvider();
+                signInWithProvider(provider);
+            });
+
+            // For Google Authentication - add auth_method to Google sign-in
+            function signInWithProvider(provider, newsletter = true) {
+                auth.signInWithPopup(provider)
+                    .then((result) => {
+                        // Check if it's a new user
+                        if (result.additionalUserInfo.isNewUser) {
+                            // Store user in database with newsletter preference
+                            db.collection('users').doc(result.user.uid).set({
+                                email: result.user.email,
+                                signup_date: firebase.firestore.FieldValue.serverTimestamp(),
+                                auth_method: 'google'
+                            });
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error during social authentication:', error);
+                        /*document.getElementById('auth-message').innerHTML = `
+                        <div class="alert alert-danger">Authentication failed. Please try a different method.</div>
+                        `;*/
+                        // Determine which tab is active
+                        const activeTab = document.querySelector('#auth-tabs .nav-link.active');
+                        if (activeTab && activeTab.id === 'login-tab') {
+                            document.getElementById('login-message').innerHTML = `
+                    <div class="alert alert-danger">Authentication failed. Please try a different method.</div>
+                    `;
+                        } else {
+                            document.getElementById('signup-message').innerHTML = `
+                    <div class="alert alert-danger">Authentication failed. Please try a different method.</div>
+                    `;
+                        }
+                    });
+            }
+
+            // Password Reset
+            document.getElementById('forgot-password-link')?.addEventListener('click', function (e) {
+                e.preventDefault();
+                const resetModal = new bootstrap.Modal(document.getElementById('password-reset-modal'));
+                resetModal.show();
+            });
+
+            document.getElementById('reset-password-btn')?.addEventListener('click', function () {
+                const email = document.getElementById('reset-email').value;
+                if (!email) {
+                    document.getElementById('reset-message').innerHTML = `
+                <div class="alert alert-danger">Please enter your email address.</div>
+            `;
+                    return;
+                }
+
+                // Show loading state
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+
+                auth.sendPasswordResetEmail(email)
+                    .then(() => {
+                        document.getElementById('reset-message').innerHTML = `
+                <div class="alert alert-success">Password reset email sent! Check your inbox.</div>
+                `;
+                        setTimeout(() => {
+                            const resetModal = bootstrap.Modal.getInstance(document.getElementById('password-reset-modal'));
+                            resetModal.hide();
+                        }, 2000);
+                    })
+                    .catch((error) => {
+                        let errorMessage = 'Failed to send reset email. Please try again.';
+                        if (error.code === 'auth/user-not-found') {
+                            errorMessage = 'No account found with this email.';
+                        }
+                        document.getElementById('reset-message').innerHTML = `
+                <div class="alert alert-danger">${errorMessage}</div>
+                `;
+                    })
+                    .finally(() => {
+                        // Reset button
+                        this.disabled = false;
+                        this.innerHTML = 'Send Reset Link';
+                    });
+            });
+
+            // Remove word highlighting when you close the word frequency accordion
+            document.getElementById('wordFrequencyCollapse').addEventListener('hidden.bs.collapse', function () {
+                clearWordHighlights();
+            });
+            document.getElementById('wordCloudCollapse').addEventListener('hidden.bs.collapse', function () {
+                clearWordHighlights();
+            });
+            document.getElementById('adverbsCollapse').addEventListener('hidden.bs.collapse', function () {
+                clearWordHighlights();
+            });
+            document.getElementById('rhymeWordsCollapse').addEventListener('hidden.bs.collapse', function () {
+                clearWordHighlights();
+            });
+
+            // Art note deletion functionality
+            document.getElementById('delete-art-notes').addEventListener('click', function () {
+                // Get current text
+                const text = quill.getText();
+
+                // Find all art notes
+                const artNotes = findArtNotes(text);
+
+                // If no art notes, show modal and return
+                if (artNotes.length === 0) {
+                    const noArtNotesModal = new bootstrap.Modal(document.getElementById('noArtNotesModal'));
+                    noArtNotesModal.show();
+                    return;
+                }
+
+                // Update confirmation text with count
+                document.getElementById('confirm-delete-text').textContent =
+                    `Are you sure you want to delete all ${artNotes.length} art note${artNotes.length === 1 ? '' : 's'} from your manuscript? This action cannot be undone.`;
+
+                // Show confirmation dialog
+                const confirmModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+                confirmModal.show();
+
+                // Handle confirmation button click
+                document.getElementById('confirm-delete-btn').onclick = function () {
+                    // Close the confirmation modal
+                    confirmModal.hide();
+
+                    // Get the original text content and split into lines
+                    const originalText = quill.getText();
+                    const originalLines = originalText.split('\n');
+
+                    // Map art notes to their line numbers
+                    const artNoteLines = mapArtNotesToLines(artNotes, originalText);
+
+                    // Sort art notes in reverse order (to avoid index shifting when removing)
+                    artNotes.sort((a, b) => b.start - a.start);
+
+                    // Store current selection if any
+                    const currentSelection = quill.getSelection();
+
+                    // Delete each art note
+                    artNotes.forEach(note => {
+                        quill.deleteText(note.start, note.end - note.start + 1);
+                    });
+
+                    // After deleting art notes, check which lines contained ONLY art notes
+                    setTimeout(() => {
+                        // Get updated text content
+                        const updatedText = quill.getText();
+                        const updatedLines = updatedText.split('\n');
+
+                        // Find lines that became empty due to art note removal
+                        cleanupEmptyArtNoteLines(originalLines, updatedLines, artNoteLines);
+
+                        // Update word counts and other stats
+                        updateWordCounts();
+
+                        // Restore selection if applicable
+                        if (currentSelection) {
+                            // Get updated content to calculate proper position
+                            const finalText = quill.getText();
+                            const adjustedIndex = Math.min(currentSelection.index, finalText.length - 1);
+                            quill.setSelection(Math.max(0, adjustedIndex), 0);
+                        }
+                    }, 0);
+
+                    // Show success message with appropriate singular/plural
+                    document.getElementById('success-delete-text').textContent =
+                        `Successfully removed ${artNotes.length} art note${artNotes.length === 1 ? '' : 's'} from your manuscript.`;
+
+                    // Show success modal
+                    setTimeout(() => {
+                        const successModal = new bootstrap.Modal(document.getElementById('successDeleteModal'));
+                        successModal.show();
+                    }, 300); // Small delay to allow confirmation modal to fully close
+                };
+            });
+
+            // Maps art notes to their line numbers in the text
+            function mapArtNotesToLines(artNotes, text) {
+                const lines = text.split('\n');
+                const artNoteLines = {};
+
+                // Create a map to track which lines contain art notes
+                let charPos = 0;
+                for (let i = 0; i < lines.length; i++) {
+                    const lineEndPos = charPos + lines[i].length;
+
+                    // Check each art note to see if it falls on this line
+                    for (const note of artNotes) {
+                        // If the art note overlaps with this line
+                        if (note.start <= lineEndPos && note.end >= charPos) {
+                            // Store what percentage of the line is occupied by the art note
+                            const lineLength = lines[i].length;
+
+                            // Calculate overlap
+                            const overlapStart = Math.max(note.start, charPos);
+                            const overlapEnd = Math.min(note.end, lineEndPos);
+                            const overlapLength = overlapEnd - overlapStart + 1;
+
+                            // Calculate coverage percentage
+                            const coverage = lineLength > 0 ? (overlapLength / lineLength) : 0;
+
+                            if (!artNoteLines[i]) {
+                                artNoteLines[i] = {
+                                    lineContent: lines[i],
+                                    notes: [],
+                                    totalCoverage: 0
+                                };
+                            }
+
+                            artNoteLines[i].notes.push({
+                                start: Math.max(0, note.start - charPos),
+                                end: Math.min(lineLength, note.end - charPos),
+                                coverage: coverage
+                            });
+
+                            artNoteLines[i].totalCoverage += coverage;
+                        }
+                    }
+
+                    // Move to the next line (add 1 for the newline character)
+                    charPos = lineEndPos + 1;
+                }
+
+                return artNoteLines;
+            }
+
+            // Cleans up lines that were entirely (or almost entirely) art notes
+            function cleanupEmptyArtNoteLines(originalLines, updatedLines, artNoteLines) {
+                // Counter to track line position shifts
+                let lineOffset = 0;
+
+                // Check each line that had art notes
+                for (const lineNum in artNoteLines) {
+                    const lineIdx = parseInt(lineNum);
+                    const lineInfo = artNoteLines[lineNum];
+
+                    // Check if this line had high art note coverage (>90%)
+                    if (lineInfo.totalCoverage > 0.9) {
+                        // Adjust for previous deletions
+                        const adjustedLineIdx = lineIdx - lineOffset;
+
+                        // Make sure the line index is valid
+                        if (adjustedLineIdx >= 0 && adjustedLineIdx < updatedLines.length) {
+                            // Check if the line is now empty or just whitespace
+                            if (updatedLines[adjustedLineIdx].trim() === '') {
+                                // Calculate the position of this line in the document
+                                let position = 0;
+                                for (let i = 0; i < adjustedLineIdx; i++) {
+                                    position += updatedLines[i].length + 1; // +1 for newline
+                                }
+
+                                // Delete the empty line (including its newline)
+                                if (adjustedLineIdx < updatedLines.length - 1) {
+                                    // Not the last line - delete line and newline
+                                    quill.deleteText(position, updatedLines[adjustedLineIdx].length + 1);
+                                } else if (adjustedLineIdx > 0) {
+                                    // Last line - delete the preceding newline and the line
+                                    quill.deleteText(position - 1, updatedLines[adjustedLineIdx].length + 1);
+                                } else {
+                                    // First and only line - just delete content
+                                    quill.deleteText(position, updatedLines[adjustedLineIdx].length);
+                                }
+
+                                // Increment offset for subsequent lines
+                                lineOffset++;
+
+                                // Update the updated lines array after deletion
+                                updatedLines.splice(adjustedLineIdx, 1);
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            // Track all main features
+            // Word Cloud generation
+            document.getElementById('generate-word-cloud')?.addEventListener('click', function () {
+                trackFeatureUsage('word_cloud');
+            });
+
+            // Readability Analysis
+            document.getElementById('analyze-readability')?.addEventListener('click', function () {
+                trackFeatureUsage('readability_analysis');
+            });
+
+            // Word Frequency
+            document.getElementById('generate-word-freq')?.addEventListener('click', function () {
+                trackFeatureUsage('word_frequency');
+            });
+
+            // Adverb Detection
+            document.getElementById('detect-adverbs')?.addEventListener('click', function () {
+                trackFeatureUsage('adverb_detection');
+            });
+
+            // Rhyme Word Detection
+            document.getElementById('detect-rhyme-words')?.addEventListener('click', function () {
+                const onlyLineEndings = document.getElementById('only-line-endings').checked;
+                trackFeatureUsage('rhyme_word_detection', {
+                    'line_endings_only': onlyLineEndings
+                });
+            });
+
+            // Art Note Deletion
+            document.getElementById('delete-art-notes')?.addEventListener('click', function () {
+                trackFeatureUsage('art_note_deletion');
+            });
+
+            // Feature Suggestion
+            document.getElementById('submit-feature-btn')?.addEventListener('click', function () {
+                trackFeatureUsage('feature_suggestion');
+            });
+
+            // Track authentication methods
+            document.getElementById('google-login-btn')?.addEventListener('click', function () {
+                if (typeof gtag === 'function') {
+                    gtag('event', 'login_attempt', { 'method': 'google' });
+                }
+            });
+
+            document.getElementById('login-form')?.addEventListener('submit', function (e) {
+                if (typeof gtag === 'function') {
+                    gtag('event', 'login_attempt', { 'method': 'email' });
+                }
+            });
+
+            document.getElementById('signup-form')?.addEventListener('submit', function (e) {
+                if (typeof gtag === 'function') {
+                    gtag('event', 'signup_attempt', { 'method': 'email' });
+                }
+            });
+
+
+            // Track external link clicks
+            document.querySelectorAll('a[target="_blank"]').forEach(link => {
+                link.addEventListener('click', function () {
+                    const linkUrl = this.href;
+                    const linkText = this.innerText || 'unnamed link';
+
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'external_link_click', {
+                            'link_url': linkUrl,
+                            'link_text': linkText
+                        });
+                    }
+                });
+            });
+
+            // Add password toggle functionality
+            document.addEventListener('click', function(e) {
+            if (e.target.closest('.password-toggle')) {
+                const button = e.target.closest('.password-toggle');
+                const passwordInput = button.previousElementSibling;
+                const icon = button.querySelector('i');
+                
+                // Toggle password visibility
+                if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+                }
+            }
+            });
+
+            // This function to detect when text selection is happening to prevent the art formatting
+            // from interrupting the user's selection
+            function setupSelectionDetection(editor) {
+                // Track when user starts selecting text
+                editor.root.addEventListener('mousedown', function(e) {
+                    isSelectingText = true;
+                    
+                    // Clear any existing timeout
+                    if (selectionTimeout) {
+                    clearTimeout(selectionTimeout);
+                    }
+                });
+                
+                // Track when user finishes selecting text
+                document.addEventListener('mouseup', function(e) {
+                    // Set a small delay before allowing highlights again
+                    // This prevents immediate re-highlighting that could disrupt the selection
+                    if (selectionTimeout) {
+                    clearTimeout(selectionTimeout);
+                    }
+                    
+                    selectionTimeout = setTimeout(function() {
+                    isSelectingText = false;
+                    // Reapply formatting after selection is complete
+                    highlightArtNotes();
+                    }, 200); // 200ms delay before re-enabling formatting
+                });
+            }
+        });
+
+        function addLogoutButton() {
+            const headerDiv = document.querySelector('header > div');
+
+            // Remove any previous authentication state listeners
+            if (window.authStateUnsubscribe) {
+                window.authStateUnsubscribe();
+            }
+
+            // Create a single logout button
+            let logoutButton = document.getElementById('logout-button');
+            if (!logoutButton) {
+                logoutButton = document.createElement('button');
+                logoutButton.id = 'logout-button';
+                logoutButton.className = 'btn btn-outline-secondary ms-2';
+                logoutButton.addEventListener('click', function () {
+                    firebase.auth().signOut().then(() => {
+                        document.getElementById('login-section').style.display = 'block';
+                        document.getElementById('editor-section').style.display = 'none';
+                    });
+                });
+            }
+
+            // Create sign in button (for mobile)
+            let signInButton = document.getElementById('sign-in-button');
+            if (!signInButton) {
+                signInButton = document.createElement('button');
+                signInButton.id = 'sign-in-button';
+                signInButton.className = 'btn btn-primary ms-2';
+                signInButton.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Sign in';
+                signInButton.addEventListener('click', function () {
+                    // Smooth scroll to Google login button to ensure it's visible
+                    const googleButton = document.getElementById('google-login-btn');
+                    if (googleButton) {
+                        googleButton.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    } else {
+                        // Fallback to scrolling to the auth panel with offset
+                        const authPanel = document.getElementById('auth-panel');
+                        if (authPanel) {
+                            const y = authPanel.getBoundingClientRect().top + window.pageYOffset - 100; // 100px offset
+                            window.scrollTo({ top: y, behavior: 'smooth' });
+                        } else {
+                            // Last resort fallback
+                            document.getElementById('login-section').scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                });
+            }
+
+            // Set up the authentication state listener
+            window.authStateUnsubscribe = firebase.auth().onAuthStateChanged(function (user) {
+                // Remove any existing auth buttons first
+                const existingLogoutButtons = headerDiv.querySelectorAll('#logout-button');
+                existingLogoutButtons.forEach(btn => btn.parentNode && headerDiv.removeChild(btn));
+
+                const existingSignInButtons = headerDiv.querySelectorAll('#sign-in-button');
+                existingSignInButtons.forEach(btn => btn.parentNode && headerDiv.removeChild(btn));
+
+                if (user) {
+                    // User is logged in, show logout button
+                    const username = user.email.split('@')[0];
+                    logoutButton.innerHTML = `
+                        <i class="fas fa-sign-out-alt me-2"></i>
+                        <span class="username-text">${username}</span>
+                        <span class="logout-text"> (Logout)</span>
+                        <span class="logout-short-text">Logout</span>
+                    `;
+                    headerDiv.appendChild(logoutButton);
+                } else {
+                    // User is logged out, show sign in button (on mobile)
+                    headerDiv.appendChild(signInButton);
+
+                    // Reset the login form submit button when logged out
+                    const loginForm = document.getElementById('login-form');
+                    if (loginForm) {
+                        const submitBtn = loginForm.querySelector('button[type="submit"]');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = 'Log In';
+                    }
+
+                    // Reset the signup form when logged out
+                    const signupForm = document.getElementById('signup-form');
+                    if (signupForm) {
+                        signupForm.reset();
+                        const submitBtn = signupForm.querySelector('button[type="submit"]');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = 'Create Account';
+                    }
+                    
+                    // Clear any signup messages
+                    const signupMessage = document.getElementById('signup-message');
+                    if (signupMessage) signupMessage.innerHTML = '';
+                }
+            });
+        }
+
+        // Function to track feature usage with Google Analytics
+        function trackFeatureUsage(featureName, additionalParams = {}) {
+            // Check if gtag is available
+            if (typeof gtag === 'function') {
+                // Combine feature name with any additional parameters
+                const eventParams = {
+                    'feature_name': featureName,
+                    ...additionalParams
+                };
+
+                // Send the event to Google Analytics
+                gtag('event', 'feature_used', eventParams);
+                console.log(`Tracked feature usage: ${featureName}`);
+            }
+        }
+
+        function removeArtNotes(text) {
+                // Get art notes using the new function
+                const artNotes = findArtNotes(text);
+
+                // Sort art notes in reverse order (to avoid index shifting when removing)
+                artNotes.sort((a, b) => b.start - a.start);
+
+                // Create a copy of the text
+                let cleanText = text;
+
+                // Remove each art note from the text
+                artNotes.forEach(note => {
+                    cleanText = cleanText.substring(0, note.start) + ' ' + cleanText.substring(note.end + 1);
+                });
+
+                return cleanText;
+        }
+
+        // Comprehensive art note detection function that handles nested parentheses
+        function findArtNotes(text) {
+            const artNotes = [];
+            let bracketDepth = 0;
+            let parenDepth = 0;
+            let currentBracketNote = "";
+            let currentParenNote = "";
+            let bracketStartIndex = -1;
+            let parenStartIndex = -1;
+            let inBracketArtNote = false;
+            let inParenArtNote = false;
+
+            // For parenthetical art notes, we need keywords
+            //const artNoteKeywords = ["art note", "illo", "illus", "illustration note", "action note"];
+            const artNoteKeywords = ["art note", "art:", "illo", "illus", "illustration note", "action note"];
+
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+
+                // Handle square bracket art notes
+                if (char === '[' && !inParenArtNote) {
+                    if (bracketDepth === 0) {
+                        // Start of a potential art note
+                        bracketStartIndex = i;
+                        currentBracketNote = "[";
+                        inBracketArtNote = true;
+                    } else {
+                        // Nested brackets inside art note
+                        currentBracketNote += char;
+                    }
+                    bracketDepth++;
+                }
+                else if (char === ']' && inBracketArtNote) {
+                    bracketDepth--;
+                    currentBracketNote += char;
+
+                    if (bracketDepth === 0) {
+                        // End of art note
+                        artNotes.push({
+                            text: currentBracketNote,
+                            start: bracketStartIndex,
+                            end: i
+                        });
+                        currentBracketNote = "";
+                        inBracketArtNote = false;
+                    }
+                }
+                // Handle parenthetical art notes
+                else if (char === '(' && !inBracketArtNote) {
+                    if (parenDepth === 0) {
+                        // This might be the start of a parenthetical art note
+                        parenStartIndex = i;
+                        currentParenNote = "(";
+                        inParenArtNote = true;
+                    } else if (inParenArtNote) {
+                        // Nested parentheses
+                        currentParenNote += char;
+                    }
+                    parenDepth++;
+                }
+                else if (char === ')' && inParenArtNote) {
+                    parenDepth--;
+                    currentParenNote += char;
+
+                    if (parenDepth === 0) {
+                        // Check if this parenthetical note contains any art note keywords
+                        const noteText = currentParenNote.toLowerCase();
+                        const isArtNote = artNoteKeywords.some(keyword => noteText.includes(keyword));
+
+                        if (isArtNote) {
+                            artNotes.push({
+                                text: currentParenNote,
+                                start: parenStartIndex,
+                                end: i
+                            });
+                        }
+
+                        currentParenNote = "";
+                        inParenArtNote = false;
+                    }
+                }
+                else {
+                    // Add character to the current art note if we're inside one
+                    if (inBracketArtNote) {
+                        currentBracketNote += char;
+                    }
+                    if (inParenArtNote) {
+                        currentParenNote += char;
+                    }
+                }
+            }
+
+            // Handle unclosed art notes (important for real-time editing)
+            // For brackets - if we have an unclosed bracket art note, don't treat it as an art note
+            // For parentheses - only consider it if it has keywords
+            if (inParenArtNote && parenStartIndex >= 0) {
+                // Check if this unclosed parenthetical contains keywords
+                const noteText = currentParenNote.toLowerCase();
+                const isArtNote = artNoteKeywords.some(keyword => noteText.includes(keyword));
+
+                if (isArtNote) {
+                    artNotes.push({
+                        text: currentParenNote,
+                        start: parenStartIndex,
+                        end: text.length - 1
+                    });
+                }
+            }
+
+            return artNotes;
+        }
+
+        function getWordsFromText(text) {
+            if (!text || text.trim() === '') {
+                return [];
+            }
+
+            return text.toLowerCase()
+                .replace(/[“”.,\/#—!$%\^&\*;:{}=\_`''~()?"…\[\]]/g, ' ')
+                .replace(/(^|\s)-|-(\s|$)/g, ' ')
+                .replace(/\s{2,}/g, ' ')
+                .trim()
+                .split(/\s+/);
+        }
+
+        
+        // Custom handler to intercept paste into quill editor and clean HTML (remove comments
+        // and tracked changes) before manually pasting
+        function setupCustomQuillPasteHandler(quill) {
+            // Get the editor element
+            const editorElement = quill.root;
+            
+            // The key is to add our listener with the 'capture' phase
+            // This ensures our handler runs before Quill's handlers
+            editorElement.addEventListener('paste', function(e) {
+                // Immediately stop propagation and prevent default
+                e.stopPropagation();
+                e.preventDefault();
+                
+                // Get clipboard data
+                const clipboardData = e.clipboardData || window.clipboardData;
+                
+                // Check if we have HTML content in the clipboard
+                let html = clipboardData.getData('text/html');
+                
+                if (html) {
+                    //console.log("Intercepted paste with HTML content:\n", html);
+                    
+                    // Clean the HTML before Quill processes it
+                    const cleanedHtml = cleanDocumentComments(html);
+                    //console.log("Cleaned HTML: \n", cleanedHtml);
+                    
+                    // Get current selection
+                    const range = quill.getSelection(true);
+                    
+                    // Insert the cleaned HTML at the cursor position
+                    quill.clipboard.dangerouslyPasteHTML(range.index, cleanedHtml);
+                } else {
+                    // If there's no HTML, just paste plain text
+                    const text = clipboardData.getData('text/plain');
+                    if (text) {
+                        const range = quill.getSelection(true);
+                        quill.insertText(range.index, text);
+                    }
+                }
+            }, true); // The 'true' here enables capture phase
+        }
+
+        // Instead of using regex to match and remove the comment list, let's try using DOM 
+        // parsing to more reliably identify and remove the comment section (to handle the 
+        // nested HTML structure of the comment list)
+        function cleanDocumentComments(html) {
+            if (!html || typeof html !== 'string') return html;
+            
+            console.log("Cleaning clipboard HTML content");
+            
+            // Create a temporary DOM element to parse the HTML
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            
+            // STEP 1: Remove the entire comment list section using DOM traversal
+            const commentLists = tempDiv.querySelectorAll('div[style*="mso-element:comment-list"]');
+            commentLists.forEach(list => {
+                list.parentNode.removeChild(list);
+            });
+            
+            // STEP 2: Remove tracked changes
+            // Remove tracked deletions (text marked as deleted)
+            const deletions = tempDiv.querySelectorAll('.msoDel, del, span[class*="msoDel"]');
+            deletions.forEach(del => {
+                del.parentNode.removeChild(del);
+            });
+            
+            // Keep only the inserted text in tracked insertions
+            const insertions = tempDiv.querySelectorAll('.msoIns, ins, span[class*="msoIns"]');
+            insertions.forEach(ins => {
+                // Replace the insertion span with just its content
+                const parent = ins.parentNode;
+                while (ins.firstChild) {
+                parent.insertBefore(ins.firstChild, ins);
+                }
+                parent.removeChild(ins);
+            });
+            
+            // STEP 3: Remove comment references and anchors
+            // Remove all comment reference elements
+            tempDiv.querySelectorAll('a[href^="#_msocom_"], a[href^="#_msoanchor_"], a[class*="msocomanchor"]').forEach(comment => {
+                comment.parentNode.removeChild(comment);
+            });
+            
+            // Remove comment brackets with text nodes (harder with DOM, we'll use the cleaned HTML later)
+            
+            // STEP 4: Remove all conditional comments for Word comment system
+            const allElements = tempDiv.querySelectorAll('*');
+            for (let i = 0; i < allElements.length; i++) {
+                const element = allElements[i];
+                // Remove comment reference spans
+                if (element.classList && 
+                    (element.classList.contains('MsoCommentReference') || 
+                    element.classList.contains('msocomtxt') ||
+                    element.classList.contains('msocomanchor'))) {
+                element.parentNode.removeChild(element);
+                }
+            }
+            
+            // Get the cleaned HTML
+            let cleanedHtml = tempDiv.innerHTML;
+            
+            // Use regex for things that are harder to clean with DOM manipulation
+            // Remove comment brackets [XYZ123]
+            cleanedHtml = cleanedHtml.replace(/\[[A-Z]+\d+\]/gi, '');
+            
+            // Remove Word-specific conditional comments
+            cleanedHtml = cleanedHtml.replace(/<!(?:\[if [^\]]*?\]|\[endif\])>/gi, '');
+            
+            // Clean up any remaining special character spans for comments
+            cleanedHtml = cleanedHtml.replace(/<span\s+style=['"]mso-special-character:comment['"][^>]*>[\s\S]*?<\/span>/gi, '');
+            
+            // Google Docs: Convert standalone <br /> tags to proper paragraph elements with non-breaking spaces. Without
+            // this, blank lines between spreads are removed.
+            cleanedHtml = cleanedHtml.replace(/<br\s*\/?>\s*(?=<p)/g, '<p>&nbsp;</p>');
+
+            return cleanedHtml;
+            }
+        
+            function improvedSentenceSplit(text) {
+                // First, normalize line breaks
+                const normalizedText = text.replace(/\r\n/g, '\n');
+                
+                // Split by obvious sentence boundaries (periods, exclamation marks, question marks)
+                // followed by whitespace or end of string
+                let chunks = normalizedText.split(/[.!?](?:\s+|$)/);
+                
+                let sentences = [];
+                
+                chunks.forEach(chunk => {
+                    if (!chunk.trim()) return;
+                    
+                    // Check for paragraph breaks within the chunk (could indicate separate thoughts)
+                    const paragraphs = chunk.split(/\n\s*\n/);
+                    
+                    if (paragraphs.length > 1) {
+                    // Multiple paragraphs should be treated as separate sentences
+                    paragraphs.forEach(para => {
+                        if (para.trim()) sentences.push(para.trim());
+                    });
+                    } else {
+                    // Single paragraph - check for line breaks that might be sentence boundaries
+                    // This handles cases where a line break is used instead of punctuation
+                    // but avoids breaking up a sentence that just happens to span multiple lines
+                    const lines = chunk.split('\n');
+                    
+                    let currentSentence = '';
+                    
+                    lines.forEach((line, index) => {
+                        const trimmedLine = line.trim();
+                        if (!trimmedLine) {
+                        // Empty line - add current sentence if any and reset
+                        if (currentSentence) {
+                            sentences.push(currentSentence);
+                            currentSentence = '';
+                        }
+                        return;
+                        }
+                        
+                        // Check if this line starts with a capital letter and previous line ends with complete thought
+                        const startsWithCapital = /^[A-Z]/.test(trimmedLine);
+                        const previousLineEndsComplete = index > 0 && /(?:,|;|:)$/.test(lines[index-1].trim());
+                        
+                        if (startsWithCapital && (currentSentence === '' || previousLineEndsComplete)) {
+                        // This appears to be a new sentence
+                        if (currentSentence) {
+                            sentences.push(currentSentence);
+                            currentSentence = trimmedLine;
+                        } else {
+                            currentSentence = trimmedLine;
+                        }
+                        } else {
+                        // Continuation of current sentence
+                        currentSentence = currentSentence 
+                            ? `${currentSentence} ${trimmedLine}` 
+                            : trimmedLine;
+                        }
+                    });
+                    
+                    // Add the last sentence if any
+                    if (currentSentence) {
+                        sentences.push(currentSentence);
+                    }
+                    }
+                });
+                
+                return sentences.filter(s => s.length > 0);
+            }
+
+    </script>
+</body>
+
+</html>
