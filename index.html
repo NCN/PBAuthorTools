@@ -175,8 +175,10 @@
         }
 
         .school-level {
-            background-color: #f8f9fa; /* Match other cards */
-            border-left: none; /* Remove the blue accent line */
+            background-color: #f8f9fa;
+            /* Match other cards */
+            border-left: none;
+            /* Remove the blue accent line */
         }
 
         /* Playful and Creative Style (No Emoji) */
@@ -387,16 +389,15 @@
         /* Add this to your existing CSS */
         @media (max-width: 768px) {
             .version-info {
-            margin-top: 0.5rem;
-            width: 100%;
-            text-align: left;
+                margin-top: 0.5rem;
+                width: 100%;
+                text-align: left;
             }
-            
+
             .list-inline {
-            flex-direction: column;
+                flex-direction: column;
             }
         }
-
     </style>
 
     <script src="version.js"></script>
@@ -615,16 +616,20 @@
                                 data-bs-parent="#featuresAccordion">
                                 <div class="accordion-body">
                                     <p class="text-muted small mb-3">
-                                        Measures text complexity with Flesch–Kincaid metrics. Higher "Reading-Ease" scores indicate easier readability, while "Grade Level" shows U.S. grade equivalent. Helps ensure your writing matches your intended audience.
-                                        <a href="https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests" target="_blank">Read more on Wikipedia</a>
-                                    </p>                                    
+                                        Measures text complexity with Flesch–Kincaid metrics. Higher "Reading-Ease"
+                                        scores indicate easier readability, while "Grade Level" shows U.S. grade
+                                        equivalent. Helps ensure your writing matches your intended audience.
+                                        <a href="https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests"
+                                            target="_blank">Read more on Wikipedia</a>
+                                    </p>
                                     <button id="analyze-readability" class="btn btn-sm btn-primary mb-3">Analyze
                                         Readability</button>
                                     <div class="readability-results" style="display: none;" id="readability-results">
                                         <div class="row">
                                             <!-- Word Count -->
                                             <div class="col-md-6 mb-2">
-                                                <div class="metric-card" data-bs-toggle="tooltip" title="Total number of words in the text, excluding art notes">
+                                                <div class="metric-card" data-bs-toggle="tooltip"
+                                                    title="Total number of words in the text, excluding art notes">
                                                     <div class="metric-value" id="word-count">0</div>
                                                     <div class="metric-label">Word Count</div>
                                                 </div>
@@ -632,7 +637,8 @@
 
                                             <!-- Sentence Count -->
                                             <div class="col-md-6 mb-2">
-                                                <div class="metric-card" data-bs-toggle="tooltip" title="Total number of sentences in the text">
+                                                <div class="metric-card" data-bs-toggle="tooltip"
+                                                    title="Total number of sentences in the text">
                                                     <div class="metric-value" id="sentence-count">0</div>
                                                     <div class="metric-label">Sentence Count</div>
                                                 </div>
@@ -640,7 +646,8 @@
 
                                             <!-- Avg Words Per Sentence -->
                                             <div class="col-md-6 mb-2">
-                                                <div class="metric-card" data-bs-toggle="tooltip" title="Average number of words in each sentence">
+                                                <div class="metric-card" data-bs-toggle="tooltip"
+                                                    title="Average number of words in each sentence">
                                                     <div class="metric-value" id="avg-words-per-sentence">0</div>
                                                     <div class="metric-label">Avg Words Per Sentence</div>
                                                 </div>
@@ -648,7 +655,8 @@
 
                                             <!-- Avg Syllables Per Word -->
                                             <div class="col-md-6 mb-2">
-                                                <div class="metric-card" data-bs-toggle="tooltip" title="Average number of syllables in each word">
+                                                <div class="metric-card" data-bs-toggle="tooltip"
+                                                    title="Average number of syllables in each word">
                                                     <div class="metric-value" id="avg-syllables-per-word">0</div>
                                                     <div class="metric-label">Avg Syllables Per Word</div>
                                                 </div>
@@ -656,20 +664,23 @@
 
                                             <!-- Grade Level -->
                                             <div class="col-md-6 mb-2">
-                                                <div class="metric-card" data-bs-toggle="tooltip" title="Flesch-Kincaid Grade Level - numerical score representing the U.S. grade level needed to understand the text">
+                                                <div class="metric-card" data-bs-toggle="tooltip"
+                                                    title="Flesch-Kincaid Grade Level - numerical score representing the U.S. grade level needed to understand the text">
                                                     <div class="metric-value" id="flesch-kincaid-grade">0</div>
                                                     <div class="metric-label">Grade Level Score</div>
                                                 </div>
                                             </div>
                                             <!-- Reading Ease Score -->
                                             <div class="col-md-6 mb-2">
-                                                <div class="metric-card" data-bs-toggle="tooltip" title="Flesch Reading Ease - higher score means easier to read (100=very easy, 0=very difficult)">
+                                                <div class="metric-card" data-bs-toggle="tooltip"
+                                                    title="Flesch Reading Ease - higher score means easier to read (100=very easy, 0=very difficult)">
                                                     <div class="metric-value" id="flesch-reading-ease">0</div>
                                                     <div class="metric-label">Reading-Ease Score</div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-2">
-                                                <div class="metric-card" data-bs-toggle="tooltip" title="Grade level based on Flesch Reading Ease score — ranges from Professional (0-10) to 5th grade (90+)">
+                                                <div class="metric-card" data-bs-toggle="tooltip"
+                                                    title="Grade level based on Flesch Reading Ease score — ranges from Professional (0-10) to 5th grade (90+)">
                                                     <div class="metric-value" id="school-level">-</div>
                                                     <div class="metric-label">Reading-Ease School Level</div>
                                                 </div>
@@ -677,7 +688,8 @@
 
                                             <!-- Complex Word Percentage -->
                                             <div class="col-md-6 mb-2">
-                                                <div class="metric-card" data-bs-toggle="tooltip" title="Percentage of words with 3 or more syllables">
+                                                <div class="metric-card" data-bs-toggle="tooltip"
+                                                    title="Percentage of words with 3 or more syllables">
                                                     <div class="metric-value" id="complex-word-percentage">0%</div>
                                                     <div class="metric-label">Complex Words (3+ syllables)</div>
                                                 </div>
@@ -698,9 +710,12 @@
                                 data-bs-parent="#featuresAccordion">
                                 <div class="accordion-body">
                                     <p class="text-muted small mb-3">
-                                        Visualizes word frequency with larger text for commonly used words. Helps identify repetitive word usage and improve vocabulary variety. Click any word to highlight all instances in your manuscript.
-                                    </p>                                    
-                                    <button id="generate-word-cloud" class="btn btn-sm btn-primary mb-2">Generate Word Cloud</button>
+                                        Visualizes word frequency with larger text for commonly used words. Helps
+                                        identify repetitive word usage and improve vocabulary variety. Click any word to
+                                        highlight all instances in your manuscript.
+                                    </p>
+                                    <button id="generate-word-cloud" class="btn btn-sm btn-primary mb-2">Generate Word
+                                        Cloud</button>
                                     <div id="word-cloud-container" class="word-cloud-container"></div>
                                 </div>
                             </div>
@@ -716,9 +731,11 @@
                                 data-bs-parent="#featuresAccordion">
                                 <div class="accordion-body">
                                     <p class="text-muted small mb-3">
-                                        Lists words by frequency to help identify repetitive word usage and improve vocabulary variety. Click any word to highlight all occurrences.
-                                    </p>                                    
-                                    <button id="generate-word-freq" class="btn btn-sm btn-primary mb-2">Generate Frequency List</button>
+                                        Lists words by frequency to help identify repetitive word usage and improve
+                                        vocabulary variety. Click any word to highlight all occurrences.
+                                    </p>
+                                    <button id="generate-word-freq" class="btn btn-sm btn-primary mb-2">Generate
+                                        Frequency List</button>
                                     <div id="word-freq-list" class="list-group">
                                         <!-- Word frequency items will be populated here -->
                                     </div>
@@ -736,8 +753,10 @@
                                 data-bs-parent="#featuresAccordion">
                                 <div class="accordion-body">
                                     <p class="text-muted small mb-3">
-                                        Identifies adverbs (often ending in "-ly") that may weaken your writing. Replace with stronger verbs for more vivid descriptions. Click any adverb to highlight all instances in your manuscript.
-                                    </p>                                    
+                                        Identifies adverbs (often ending in "-ly") that may weaken your writing. Replace
+                                        with stronger verbs for more vivid descriptions. Click any adverb to highlight
+                                        all instances in your manuscript.
+                                    </p>
                                     <button id="detect-adverbs" class="btn btn-sm btn-primary mb-2">Detect
                                         Adverbs</button>
                                     <div id="adverbs-list" class="list-group">
@@ -757,7 +776,8 @@
                                 data-bs-parent="#featuresAccordion">
                                 <div class="accordion-body">
                                     <p class="text-muted small mb-3">
-                                        Identifies words with ambiguous syllable counts or inconsistent pronunciations or stresses 
+                                        Identifies words with ambiguous syllable counts or inconsistent pronunciations
+                                        or stresses
                                         across contexts, accents,
                                         or reading styles. Click any word to highlight all instances in your manuscript.
                                     </p>
@@ -929,8 +949,8 @@
                         </li>
                         <li class="list-inline-item version-info">
                             <small id="site-version">v1.0.0</small>
-                          </li>
-                        </ul>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </footer>
@@ -1096,11 +1116,11 @@
                 if (word.slice(-2) === "es" || word.slice(-2) === "ed") {
                     const doubleAndtripple_1 = (word.match(/[eaoui][eaoui]/g) || []).length;
                     if (doubleAndtripple_1 > 1 || (word.match(/[eaoui][^eaoui]/g) || []).length > 1) {
-                    if (word.slice(-3) === "ted" || word.slice(-3) === "tes" || word.slice(-3) === "ses" || word.slice(-3) === "ied" || word.slice(-3) === "ies") {
-                        // pass
-                    } else {
-                        disc += 1;
-                    }
+                        if (word.slice(-3) === "ted" || word.slice(-3) === "tes" || word.slice(-3) === "ses" || word.slice(-3) === "ied" || word.slice(-3) === "ies") {
+                            // pass
+                        } else {
+                            disc += 1;
+                        }
                     }
                 }
 
@@ -1109,9 +1129,9 @@
 
                 if (word.slice(-1) === "e") {
                     if (word.slice(-2) === "le" && !le_except.includes(word)) {
-                    // pass
+                        // pass
                     } else {
-                    disc += 1;
+                        disc += 1;
                     }
                 }
 
@@ -1131,20 +1151,20 @@
                 // 7) add one if ends with "y" but is not surrounded by vowel
                 if (word.slice(-1) === "y" && !["a", "e", "o", "u", "i"].includes(word.slice(-2, -1))) {
                     if ((word.slice(-3) === "ely") || (word.slice(-3) === "ety")) {
-                    // Skip adding a syllable for -ly endings
+                        // Skip adding a syllable for -ly endings
                     } else {
-                    syls += 1;
+                        syls += 1;
                     }
                 }
 
                 // 8) add one if "y" is surrounded by non-vowels and is not in the last word.
                 for (let i = 0; i < word.length; i++) {
                     if (word[i] === "y") {
-                    if (i !== 0 && i !== word.length - 1) {
-                        if (!["a", "e", "o", "u", "i"].includes(word[i - 1]) && !["a", "e", "o", "u", "i"].includes(word[i + 1])) {
-                        syls += 1;
+                        if (i !== 0 && i !== word.length - 1) {
+                            if (!["a", "e", "o", "u", "i"].includes(word[i - 1]) && !["a", "e", "o", "u", "i"].includes(word[i + 1])) {
+                                syls += 1;
+                            }
                         }
-                    }
                     }
                 }
 
@@ -1160,29 +1180,29 @@
                 // 10) if ends with "-ian", should be counted as two syllables, except for "-tian" and "-cian"
                 if (word.slice(-3) === "ian") {
                     if (word.length > 4 && (word.slice(-4) === "cian" || word.slice(-4) === "tian")) {
-                    // pass
+                        // pass
                     } else {
-                    syls += 1;
+                        syls += 1;
                     }
                 }
 
                 // 11) if starts with "co-" and is followed by a vowel, check if exists in the double syllable dictionary, if not, check if in single dictionary and act accordingly.
                 if (word.slice(0, 2) === "co" && word.length > 2 && ["a", "e", "o", "u", "i"].includes(word[2])) {
                     if (co_two.includes(word.slice(0, 4)) || co_two.includes(word.slice(0, 5)) || co_two.includes(word.slice(0, 6))) {
-                    syls += 1;
+                        syls += 1;
                     } else if (co_one.includes(word.slice(0, 4)) || co_one.includes(word.slice(0, 5)) || co_one.includes(word.slice(0, 6))) {
-                    // pass
+                        // pass
                     } else {
-                    syls += 1;
+                        syls += 1;
                     }
                 }
 
                 // 12) if starts with "pre-" and is followed by a vowel, check if exists in the double syllable dictionary, if not, check if in single dictionary and act accordingly.
                 if (word.slice(0, 3) === "pre" && word.length > 3 && ["a", "e", "o", "u", "i"].includes(word[3])) {
                     if (pre_one.includes(word.slice(0, 6))) {
-                    // pass
+                        // pass
                     } else {
-                    syls += 1;
+                        syls += 1;
                     }
                 }
 
@@ -1191,9 +1211,9 @@
 
                 if (word.slice(-3) === "n't") {
                     if (negative.includes(word)) {
-                    syls += 1;
+                        syls += 1;
                     } else {
-                    // pass
+                        // pass
                     }
                 }
 
@@ -1211,7 +1231,7 @@
 
                 // Ensure at least 1 syllable for any word
                 return Math.max(1, result);
-                }
+            }
 
             // Analyze Readability
             static analyze(text) {
@@ -1406,7 +1426,7 @@
                         [{ 'align': [] }],
                         ['clean']
                     ],
-                    clipboard: {},  
+                    clipboard: {},
                     keyboard: {
                         bindings: {
                             'enter': {
@@ -1758,7 +1778,7 @@
                 if (!isSelectingText) {
                     updateWordCounts();
                     highlightArtNotes();
-                } 
+                }
             }, 450);
 
             // Monitor quill content changes
@@ -2281,7 +2301,7 @@
                 // Clear any existing error messages
                 document.getElementById('login-message').innerHTML = '';
                 document.getElementById('signup-message').innerHTML = '';
-                
+
                 const provider = new firebase.auth.GoogleAuthProvider();
                 signInWithProvider(provider);
             });
@@ -2632,50 +2652,50 @@
             });
 
             // Add password toggle functionality
-            document.addEventListener('click', function(e) {
-            if (e.target.closest('.password-toggle')) {
-                const button = e.target.closest('.password-toggle');
-                const passwordInput = button.previousElementSibling;
-                const icon = button.querySelector('i');
-                
-                // Toggle password visibility
-                if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-                } else {
-                passwordInput.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+            document.addEventListener('click', function (e) {
+                if (e.target.closest('.password-toggle')) {
+                    const button = e.target.closest('.password-toggle');
+                    const passwordInput = button.previousElementSibling;
+                    const icon = button.querySelector('i');
+
+                    // Toggle password visibility
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        passwordInput.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
                 }
-            }
             });
 
             // This function to detect when text selection is happening to prevent the art formatting
             // from interrupting the user's selection
             function setupSelectionDetection(editor) {
                 // Track when user starts selecting text
-                editor.root.addEventListener('mousedown', function(e) {
+                editor.root.addEventListener('mousedown', function (e) {
                     isSelectingText = true;
-                    
+
                     // Clear any existing timeout
                     if (selectionTimeout) {
-                    clearTimeout(selectionTimeout);
+                        clearTimeout(selectionTimeout);
                     }
                 });
-                
+
                 // Track when user finishes selecting text
-                document.addEventListener('mouseup', function(e) {
+                document.addEventListener('mouseup', function (e) {
                     // Set a small delay before allowing highlights again
                     // This prevents immediate re-highlighting that could disrupt the selection
                     if (selectionTimeout) {
-                    clearTimeout(selectionTimeout);
+                        clearTimeout(selectionTimeout);
                     }
-                    
-                    selectionTimeout = setTimeout(function() {
-                    isSelectingText = false;
-                    // Reapply formatting after selection is complete
-                    highlightArtNotes();
+
+                    selectionTimeout = setTimeout(function () {
+                        isSelectingText = false;
+                        // Reapply formatting after selection is complete
+                        highlightArtNotes();
                     }, 200); // 200ms delay before re-enabling formatting
                 });
             }
@@ -2768,7 +2788,7 @@
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = 'Create Account';
                     }
-                    
+
                     // Clear any signup messages
                     const signupMessage = document.getElementById('signup-message');
                     if (signupMessage) signupMessage.innerHTML = '';
@@ -2793,21 +2813,21 @@
         }
 
         function removeArtNotes(text) {
-                // Get art notes using the new function
-                const artNotes = findArtNotes(text);
+            // Get art notes using the new function
+            const artNotes = findArtNotes(text);
 
-                // Sort art notes in reverse order (to avoid index shifting when removing)
-                artNotes.sort((a, b) => b.start - a.start);
+            // Sort art notes in reverse order (to avoid index shifting when removing)
+            artNotes.sort((a, b) => b.start - a.start);
 
-                // Create a copy of the text
-                let cleanText = text;
+            // Create a copy of the text
+            let cleanText = text;
 
-                // Remove each art note from the text
-                artNotes.forEach(note => {
-                    cleanText = cleanText.substring(0, note.start) + ' ' + cleanText.substring(note.end + 1);
-                });
+            // Remove each art note from the text
+            artNotes.forEach(note => {
+                cleanText = cleanText.substring(0, note.start) + ' ' + cleanText.substring(note.end + 1);
+            });
 
-                return cleanText;
+            return cleanText;
         }
 
         // Comprehensive art note detection function that handles nested parentheses
@@ -2935,36 +2955,36 @@
                 .split(/\s+/);
         }
 
-        
+
         // Custom handler to intercept paste into quill editor and clean HTML (remove comments
         // and tracked changes) before manually pasting
         function setupCustomQuillPasteHandler(quill) {
             // Get the editor element
             const editorElement = quill.root;
-            
+
             // The key is to add our listener with the 'capture' phase
             // This ensures our handler runs before Quill's handlers
-            editorElement.addEventListener('paste', function(e) {
+            editorElement.addEventListener('paste', function (e) {
                 // Immediately stop propagation and prevent default
                 e.stopPropagation();
                 e.preventDefault();
-                
+
                 // Get clipboard data
                 const clipboardData = e.clipboardData || window.clipboardData;
-                
+
                 // Check if we have HTML content in the clipboard
                 let html = clipboardData.getData('text/html');
-                
+
                 if (html) {
                     //console.log("Intercepted paste with HTML content:\n", html);
-                    
+
                     // Clean the HTML before Quill processes it
                     const cleanedHtml = cleanDocumentComments(html);
                     //console.log("Cleaned HTML: \n", cleanedHtml);
-                    
+
                     // Get current selection
                     const range = quill.getSelection(true);
-                    
+
                     // Insert the cleaned HTML at the cursor position
                     quill.clipboard.dangerouslyPasteHTML(range.index, cleanedHtml);
                 } else {
@@ -2983,147 +3003,147 @@
         // nested HTML structure of the comment list)
         function cleanDocumentComments(html) {
             if (!html || typeof html !== 'string') return html;
-            
+
             console.log("Cleaning clipboard HTML content");
-            
+
             // Create a temporary DOM element to parse the HTML
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = html;
-            
+
             // STEP 1: Remove the entire comment list section using DOM traversal
             const commentLists = tempDiv.querySelectorAll('div[style*="mso-element:comment-list"]');
             commentLists.forEach(list => {
                 list.parentNode.removeChild(list);
             });
-            
+
             // STEP 2: Remove tracked changes
             // Remove tracked deletions (text marked as deleted)
             const deletions = tempDiv.querySelectorAll('.msoDel, del, span[class*="msoDel"]');
             deletions.forEach(del => {
                 del.parentNode.removeChild(del);
             });
-            
+
             // Keep only the inserted text in tracked insertions
             const insertions = tempDiv.querySelectorAll('.msoIns, ins, span[class*="msoIns"]');
             insertions.forEach(ins => {
                 // Replace the insertion span with just its content
                 const parent = ins.parentNode;
                 while (ins.firstChild) {
-                parent.insertBefore(ins.firstChild, ins);
+                    parent.insertBefore(ins.firstChild, ins);
                 }
                 parent.removeChild(ins);
             });
-            
+
             // STEP 3: Remove comment references and anchors
             // Remove all comment reference elements
             tempDiv.querySelectorAll('a[href^="#_msocom_"], a[href^="#_msoanchor_"], a[class*="msocomanchor"]').forEach(comment => {
                 comment.parentNode.removeChild(comment);
             });
-            
+
             // Remove comment brackets with text nodes (harder with DOM, we'll use the cleaned HTML later)
-            
+
             // STEP 4: Remove all conditional comments for Word comment system
             const allElements = tempDiv.querySelectorAll('*');
             for (let i = 0; i < allElements.length; i++) {
                 const element = allElements[i];
                 // Remove comment reference spans
-                if (element.classList && 
-                    (element.classList.contains('MsoCommentReference') || 
-                    element.classList.contains('msocomtxt') ||
-                    element.classList.contains('msocomanchor'))) {
-                element.parentNode.removeChild(element);
+                if (element.classList &&
+                    (element.classList.contains('MsoCommentReference') ||
+                        element.classList.contains('msocomtxt') ||
+                        element.classList.contains('msocomanchor'))) {
+                    element.parentNode.removeChild(element);
                 }
             }
-            
+
             // Get the cleaned HTML
             let cleanedHtml = tempDiv.innerHTML;
-            
+
             // Use regex for things that are harder to clean with DOM manipulation
             // Remove comment brackets [XYZ123]
             cleanedHtml = cleanedHtml.replace(/\[[A-Z]+\d+\]/gi, '');
-            
+
             // Remove Word-specific conditional comments
             cleanedHtml = cleanedHtml.replace(/<!(?:\[if [^\]]*?\]|\[endif\])>/gi, '');
-            
+
             // Clean up any remaining special character spans for comments
             cleanedHtml = cleanedHtml.replace(/<span\s+style=['"]mso-special-character:comment['"][^>]*>[\s\S]*?<\/span>/gi, '');
-            
+
             // Google Docs: Convert standalone <br /> tags to proper paragraph elements with non-breaking spaces. Without
             // this, blank lines between spreads are removed.
             cleanedHtml = cleanedHtml.replace(/<br\s*\/?>\s*(?=<p)/g, '<p>&nbsp;</p>');
 
             return cleanedHtml;
-            }
-        
-            function improvedSentenceSplit(text) {
-                // First, normalize line breaks
-                const normalizedText = text.replace(/\r\n/g, '\n');
-                
-                // Split by obvious sentence boundaries (periods, exclamation marks, question marks)
-                // followed by whitespace or end of string
-                let chunks = normalizedText.split(/[.!?](?:\s+|$)/);
-                
-                let sentences = [];
-                
-                chunks.forEach(chunk => {
-                    if (!chunk.trim()) return;
-                    
-                    // Check for paragraph breaks within the chunk (could indicate separate thoughts)
-                    const paragraphs = chunk.split(/\n\s*\n/);
-                    
-                    if (paragraphs.length > 1) {
+        }
+
+        function improvedSentenceSplit(text) {
+            // First, normalize line breaks
+            const normalizedText = text.replace(/\r\n/g, '\n');
+
+            // Split by obvious sentence boundaries (periods, exclamation marks, question marks)
+            // followed by whitespace or end of string
+            let chunks = normalizedText.split(/[.!?](?:\s+|$)/);
+
+            let sentences = [];
+
+            chunks.forEach(chunk => {
+                if (!chunk.trim()) return;
+
+                // Check for paragraph breaks within the chunk (could indicate separate thoughts)
+                const paragraphs = chunk.split(/\n\s*\n/);
+
+                if (paragraphs.length > 1) {
                     // Multiple paragraphs should be treated as separate sentences
                     paragraphs.forEach(para => {
                         if (para.trim()) sentences.push(para.trim());
                     });
-                    } else {
+                } else {
                     // Single paragraph - check for line breaks that might be sentence boundaries
                     // This handles cases where a line break is used instead of punctuation
                     // but avoids breaking up a sentence that just happens to span multiple lines
                     const lines = chunk.split('\n');
-                    
+
                     let currentSentence = '';
-                    
+
                     lines.forEach((line, index) => {
                         const trimmedLine = line.trim();
                         if (!trimmedLine) {
-                        // Empty line - add current sentence if any and reset
-                        if (currentSentence) {
-                            sentences.push(currentSentence);
-                            currentSentence = '';
+                            // Empty line - add current sentence if any and reset
+                            if (currentSentence) {
+                                sentences.push(currentSentence);
+                                currentSentence = '';
+                            }
+                            return;
                         }
-                        return;
-                        }
-                        
+
                         // Check if this line starts with a capital letter and previous line ends with complete thought
                         const startsWithCapital = /^[A-Z]/.test(trimmedLine);
-                        const previousLineEndsComplete = index > 0 && /(?:,|;|:)$/.test(lines[index-1].trim());
-                        
+                        const previousLineEndsComplete = index > 0 && /(?:,|;|:)$/.test(lines[index - 1].trim());
+
                         if (startsWithCapital && (currentSentence === '' || previousLineEndsComplete)) {
-                        // This appears to be a new sentence
-                        if (currentSentence) {
-                            sentences.push(currentSentence);
-                            currentSentence = trimmedLine;
+                            // This appears to be a new sentence
+                            if (currentSentence) {
+                                sentences.push(currentSentence);
+                                currentSentence = trimmedLine;
+                            } else {
+                                currentSentence = trimmedLine;
+                            }
                         } else {
-                            currentSentence = trimmedLine;
-                        }
-                        } else {
-                        // Continuation of current sentence
-                        currentSentence = currentSentence 
-                            ? `${currentSentence} ${trimmedLine}` 
-                            : trimmedLine;
+                            // Continuation of current sentence
+                            currentSentence = currentSentence
+                                ? `${currentSentence} ${trimmedLine}`
+                                : trimmedLine;
                         }
                     });
-                    
+
                     // Add the last sentence if any
                     if (currentSentence) {
                         sentences.push(currentSentence);
                     }
-                    }
-                });
-                
-                return sentences.filter(s => s.length > 0);
-            }
+                }
+            });
+
+            return sentences.filter(s => s.length > 0);
+        }
 
     </script>
 </body>
