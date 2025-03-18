@@ -13,20 +13,23 @@ jobs:
 
       - name: Generate Version Info
         run: |
-          BUILD_DATE=$(date '+%Y-%m-%d')
+          # Set timezone to EST for date command
+          export TZ="America/New_York"
+          
+          # Format date with EST time (12-hour format with AM/PM)
+          BUILD_DATETIME=$(date '+%Y-%m-%d %I:%M %p EST')
           COMMIT_HASH=$(git rev-parse --short HEAD)
+          
+          # Use the commit hash as part of the version
           echo "window.SITE_VERSION = {" > version.js
-          echo "  version: \"1.0.0\"," >> version.js
-          echo "  buildDate: \"$BUILD_DATE\"," >> version.js
-          echo "  commit: \"$COMMIT_HASH\"" >> version.js
+          echo "  version: \"${COMMIT_HASH}\"," >> version.js
+          echo "  buildDate: \"$BUILD_DATETIME\"" >> version.js
           echo "};" >> version.js
           
-          # Debug - list files
-          echo "Files in directory after generating version.js:"
-          ls -la
+          # Debug - show the content
+          echo "Generated version.js:"
+          cat version.js
 
-      # Remove the Deploy step that uses JamesIves action
-      # Instead, commit changes directly to main branch
       - name: Commit Version File
         run: |
           git config --global user.name 'GitHub Actions'
