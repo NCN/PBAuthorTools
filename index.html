@@ -383,6 +383,20 @@
             font-size: 0.9rem;
             /* Match the size of the other buttons */
         }
+
+        /* Add this to your existing CSS */
+        @media (max-width: 768px) {
+            .version-info {
+            margin-top: 0.5rem;
+            width: 100%;
+            text-align: left;
+            }
+            
+            .list-inline {
+            flex-direction: column;
+            }
+        }
+
     </style>
 
     <script src="version.js"></script>
@@ -913,10 +927,10 @@
                         <li class="list-inline-item">
                             <a href="https://hellonathan.ca/authortools-support" target="_blank">Support</a>
                         </li>
-                        <li class="list-inline-item float-end text-muted">
+                        <li class="list-inline-item version-info">
                             <small id="site-version">v1.0.0</small>
-                        </li>
-                    </ul>
+                          </li>
+                        </ul>
                 </div>
             </div>
         </footer>
