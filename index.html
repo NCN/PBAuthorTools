@@ -2761,9 +2761,11 @@
                 if (user) {
                     // User is logged in, show logout button
                     const username = user.email.split('@')[0];
+                    // Truncate username if longer than 14 characters
+                    const displayUsername = username.length > 14 ? username.substring(0, 14) + '...' : username;
                     logoutButton.innerHTML = `
                         <i class="fas fa-sign-out-alt me-2"></i>
-                        <span class="username-text">${username}</span>
+                        <span class="username-text">${displayUsername}</span>
                         <span class="logout-text"> (Logout)</span>
                         <span class="logout-short-text">Logout</span>
                     `;
