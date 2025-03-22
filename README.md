@@ -114,7 +114,7 @@ The Lambda function (`firebase-monitor/index.js`) serves as a bridge between Fir
 
 ### macOS Setup Guide
 
-Here's how to set up and run the project locally on macOS:
+Here's how to set up and run the Picture Book Author Tools website locally on macOS:
 
 1. **Install Homebrew** (if not already installed)
    ```bash
@@ -133,13 +133,13 @@ Here's how to set up and run the project locally on macOS:
 
 4. **Clone the repository** (if you haven't already)
    ```bash
-   git clone https://github.com/yourusername/firebase-monitor.git
-   cd firebase-monitor
+   git clone https://github.com/yourusername/pb-author-tools.git
+   cd pb-author-tools
    ```
 
-5. **Install project dependencies**
+5. **Install Firebase client library**
    ```bash
-   npm install
+   npm install firebase
    ```
 
 6. **Install http-server globally**
@@ -157,19 +157,21 @@ Here's how to set up and run the project locally on macOS:
    ```
    http://localhost:8080
    ```
+   This will load the index.html file in the root directory.
 
 ### Project-Specific Setup Notes
 
-- **Firebase configuration**: The application uses Firebase for authentication and database functionality. If you're working with a fresh clone of the repository, you may need to set up your own Firebase project and update the configuration in the code.
+- **Firebase configuration**: The application uses Firebase for authentication and database functionality. The Firebase configuration is already included in the index.html file, but if you're developing with your own Firebase project, you'll need to update the Firebase config object in the HTML file.
 
-- **Chrome for testing**: While Safari works well for basic testing, Chrome is recommended for comprehensive testing of all features, especially when using Firebase emulators.
+- **Testing with Chrome**: While Safari works well for basic testing, Chrome is recommended for comprehensive testing of all features, especially when using Firebase authentication.
 
-- **Making changes**: After making changes to the code, you may need to restart the http-server or refresh your browser to see the updates.
+- **Making changes**: After making changes to HTML, CSS, or JavaScript code, you only need to refresh your browser to see the updates. The http-server does not need to be restarted.
 
 ### Troubleshooting
 
-- If you encounter CORS issues, make sure you're running the application through http-server rather than opening the HTML file directly.
-- Firebase authentication may not work locally unless you configure Firebase to allow localhost domains.
+- If you encounter CORS issues when testing Firebase functionality, make sure you're running the application through http-server rather than opening the HTML file directly.
+- For Firebase authentication to work locally, ensure that you've added "localhost" as an authorized domain in your Firebase project settings (Authentication > Sign-in method > Authorized domains).
+- If Firebase features don't work, check the browser console for error messages.
 
 ## Privacy & Security Considerations
 
