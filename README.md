@@ -110,6 +110,67 @@ The Lambda function (`firebase-monitor/index.js`) serves as a bridge between Fir
 3. **Notification**: Formats and sends email alerts via Amazon SES
 4. **State Management**: Updates DynamoDB with timestamps of last checks
 
+## Local Development
+
+### macOS Setup Guide
+
+Here's how to set up and run the project locally on macOS:
+
+1. **Install Homebrew** (if not already installed)
+   ```bash
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   ```
+
+2. **Install Node.js using Homebrew**
+   ```bash
+   brew install node
+   ```
+
+3. **Verify Node.js installation**
+   ```bash
+   node -v
+   ```
+
+4. **Clone the repository** (if you haven't already)
+   ```bash
+   git clone https://github.com/yourusername/firebase-monitor.git
+   cd firebase-monitor
+   ```
+
+5. **Install project dependencies**
+   ```bash
+   npm install
+   ```
+
+6. **Install http-server globally**
+   ```bash
+   npm install -g http-server
+   ```
+
+7. **Start the local development server**
+   ```bash
+   http-server -p 8080
+   ```
+
+8. **Access the application in your browser**
+   Open Safari or your preferred browser and navigate to:
+   ```
+   http://localhost:8080
+   ```
+
+### Project-Specific Setup Notes
+
+- **Firebase configuration**: The application uses Firebase for authentication and database functionality. If you're working with a fresh clone of the repository, you may need to set up your own Firebase project and update the configuration in the code.
+
+- **Chrome for testing**: While Safari works well for basic testing, Chrome is recommended for comprehensive testing of all features, especially when using Firebase emulators.
+
+- **Making changes**: After making changes to the code, you may need to restart the http-server or refresh your browser to see the updates.
+
+### Troubleshooting
+
+- If you encounter CORS issues, make sure you're running the application through http-server rather than opening the HTML file directly.
+- Firebase authentication may not work locally unless you configure Firebase to allow localhost domains.
+
 ## Privacy & Security Considerations
 
 - Manuscript text is never transmitted to servers
