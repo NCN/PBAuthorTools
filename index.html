@@ -2950,8 +2950,13 @@
             }
 
             return text.toLowerCase()
-                .replace(/[“”.,\/#—!$%\^&\*;:{}=\_`''~()?"…\[\]]/g, ' ')
+                // Remove punctuation but preserve apostrophes within words (contractions)
+                .replace(/["".,\/#—!$%\^&\*;:{}=\_`~()?"…\[\]]/g, ' ')
+                // Remove apostrophes at the beginning or end of words (quotes)
+                .replace(/(\s|^)'|'(\s|$)/g, '$1 $2')
+                // Remove standalone hyphens but preserve hyphenated words
                 .replace(/(^|\s)-|-(\s|$)/g, ' ')
+                // Collapse multiple spaces
                 .replace(/\s{2,}/g, ' ')
                 .trim()
                 .split(/\s+/);
